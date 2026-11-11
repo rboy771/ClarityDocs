@@ -55,7 +55,7 @@ CATEGORY_TO_REQUIREMENT = {
 }
 
 
-def detect_issuing_body(lower_text: str) -> str:
+def detect_issuing_body(lower_text: str) -> Optional[str]:
     if "home office" in lower_text or "ukvi" in lower_text or "visas and immigration" in lower_text:
         return "UK Visas and Immigration (Home Office)"
     if "dwp" in lower_text or "department for work and pensions" in lower_text or "jobcentre" in lower_text:
@@ -64,7 +64,7 @@ def detect_issuing_body(lower_text: str) -> str:
         return "HM Courts & Tribunals Service"
     if "council" in lower_text:
         return "Local Authority Council"
-    return "UK Statutory Authority"
+    return None
 
 
 class StatutoryRuleMatcher:
@@ -81,6 +81,18 @@ class StatutoryRuleMatcher:
     ) -> BreakdownReport:
         lower_text = sanitized_text.lower()
         issuing_body = detect_issuing_body(lower_text)
+
+        # Gate: If the document is not an official statutory letter, reject gracefully
+        if not issuing_body:
+            return BreakdownReport(
+                document_title="Unrecognized Document",
+                issuing_body="Unknown / Non-Statutory Document",
+                summary="No official UKVI, Home Office, DWP, HMCTS, or Local Council notice detected in this document. Please ensure you upload an official decision, request, or correspondence letter.",
+                deadlines=[],
+                evidence_checklist=[],
+                redacted_items_count=redaction_count,
+                raw_sanitized_length=len(sanitized_text),
+            )
 
         # Deadlines. A stated cut-off ("reply by 24 November 2026") wins; otherwise
         # letter date + window; otherwise only the generic window is known.

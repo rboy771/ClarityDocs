@@ -452,7 +452,17 @@ Failure to submit evidence within 14 days may result in refusal without refund.`
       emptyState.classList.add('hidden');
       resultsContainer.classList.remove('hidden');
 
-      document.getElementById('authorityTag').textContent = report.issuing_body;
+      // Check if document was unrecognized
+      const isUnrecognized = report.issuing_body.includes('Unknown') || report.document_title === 'Unrecognized Document';
+      const authorityTag = document.getElementById('authorityTag');
+      
+      authorityTag.textContent = report.issuing_body;
+      if (isUnrecognized) {
+        authorityTag.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20';
+      } else {
+        authorityTag.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
+      }
+
       document.getElementById('redactionBadge').textContent = `${report.redacted_items_count} PII identifiers redacted locally`;
       document.getElementById('reportTitle').textContent = report.document_title;
       document.getElementById('reportSummary').textContent = report.summary;
@@ -461,88 +471,96 @@ Failure to submit evidence within 14 days may result in refusal without refund.`
       const deadlinesList = document.getElementById('deadlinesList');
       deadlinesList.innerHTML = '';
 
-      report.deadlines.forEach(d => {
-        let urgencyBadge = '';
-        let cardBorder = 'border-slate-800';
+      if (report.deadlines.length === 0) {
+        deadlinesList.innerHTML = '<div class="text-xs text-slate-400 italic">No legal deadlines or statutory response windows found.</div>';
+      } else {
+        report.deadlines.forEach(d => {
+          let urgencyBadge = '';
+          let cardBorder = 'border-slate-800';
 
-        if (d.urgency === 'expired') {
-          urgencyBadge = '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-xs font-semibold uppercase">EXPIRED</span>';
-          cardBorder = 'border-rose-500/40 bg-rose-950/10';
-        } else if (d.urgency === 'critical') {
-          urgencyBadge = '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-xs font-semibold uppercase">CRITICAL</span>';
-          cardBorder = 'border-rose-500/30 bg-rose-950/10';
-        } else if (d.urgency === 'warning') {
-          urgencyBadge = '<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-xs font-semibold uppercase">WARNING</span>';
-          cardBorder = 'border-amber-500/20';
-        } else {
-          urgencyBadge = '<span class="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded text-xs font-semibold uppercase">STANDARD</span>';
-        }
-
-        let countdownText = '';
-        if (d.days_remaining !== null) {
-          if (d.days_remaining < 0) {
-            countdownText = `<span class="text-rose-400 font-mono font-medium">${Math.abs(d.days_remaining)} days overdue</span>`;
-          } else if (d.days_remaining === 0) {
-            countdownText = `<span class="text-rose-400 font-mono font-medium">Due TODAY</span>`;
+          if (d.urgency === 'expired') {
+            urgencyBadge = '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-xs font-semibold uppercase">EXPIRED</span>';
+            cardBorder = 'border-rose-500/40 bg-rose-950/10';
+          } else if (d.urgency === 'critical') {
+            urgencyBadge = '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-xs font-semibold uppercase">CRITICAL</span>';
+            cardBorder = 'border-rose-500/30 bg-rose-950/10';
+          } else if (d.urgency === 'warning') {
+            urgencyBadge = '<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-xs font-semibold uppercase">WARNING</span>';
+            cardBorder = 'border-amber-500/20';
           } else {
-            countdownText = `<span class="text-indigo-400 font-mono font-medium">${d.days_remaining} days left</span>`;
+            urgencyBadge = '<span class="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded text-xs font-semibold uppercase">STANDARD</span>';
           }
-        }
 
-        const div = document.createElement('div');
-        div.className = `p-3.5 rounded-lg border ${cardBorder} flex flex-col gap-1.5`;
-        div.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="text-sm font-semibold text-slate-100">${d.title}</span>
-            <div class="flex items-center gap-2">
-              ${countdownText}
-              ${urgencyBadge}
+          let countdownText = '';
+          if (d.days_remaining !== null) {
+            if (d.days_remaining < 0) {
+              countdownText = `<span class="text-rose-400 font-mono font-medium">${Math.abs(d.days_remaining)} days overdue</span>`;
+            } else if (d.days_remaining === 0) {
+              countdownText = `<span class="text-rose-400 font-mono font-medium">Due TODAY</span>`;
+            } else {
+              countdownText = `<span class="text-indigo-400 font-mono font-medium">${d.days_remaining} days left</span>`;
+            }
+          }
+
+          const div = document.createElement('div');
+          div.className = `p-3.5 rounded-lg border ${cardBorder} flex flex-col gap-1.5`;
+          div.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold text-slate-100">${d.title}</span>
+              <div class="flex items-center gap-2">
+                ${countdownText}
+                ${urgencyBadge}
+              </div>
             </div>
-          </div>
-          <p class="text-xs text-slate-400 leading-relaxed">${d.statutory_consequence}</p>
-          ${d.due_date ? `<div class="text-[11px] font-mono text-slate-500 mt-0.5">Calculated Expiry Date: ${d.due_date}</div>` : ''}
-        `;
-        deadlinesList.appendChild(div);
-      });
+            <p class="text-xs text-slate-400 leading-relaxed">${d.statutory_consequence}</p>
+            ${d.due_date ? `<div class="text-[11px] font-mono text-slate-500 mt-0.5">Calculated Expiry Date: ${d.due_date}</div>` : ''}
+          `;
+          deadlinesList.appendChild(div);
+        });
+      }
 
       // Render Evidence
       const evidenceList = document.getElementById('evidenceList');
       evidenceList.innerHTML = '';
 
-      report.evidence_checklist.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'border border-slate-800 rounded-lg p-4 bg-slate-950/40 flex flex-col gap-2.5';
+      if (report.evidence_checklist.length === 0) {
+        evidenceList.innerHTML = '<div class="text-xs text-slate-400 italic">No statutory documentation requirements identified.</div>';
+      } else {
+        report.evidence_checklist.forEach((item, index) => {
+          const div = document.createElement('div');
+          div.className = 'border border-slate-800 rounded-lg p-4 bg-slate-950/40 flex flex-col gap-2.5';
 
-        const pitfallsHtml = item.common_pitfalls.map(p => `
-          <li class="flex items-start gap-2 text-xs text-slate-400">
-            <span class="text-rose-400 mt-0.5">✕</span>
-            <span>${p}</span>
-          </li>
-        `).join('');
+          const pitfallsHtml = item.common_pitfalls.map(p => `
+            <li class="flex items-start gap-2 text-xs text-slate-400">
+              <span class="text-rose-400 mt-0.5">✕</span>
+              <span>${p}</span>
+            </li>
+          `).join('');
 
-        div.innerHTML = `
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex items-center gap-2.5">
-              <input type="checkbox" id="chk_${index}" data-print-index="${index}" class="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 h-4 w-4 bg-slate-900 cursor-pointer">
-              <label for="chk_${index}" class="text-sm font-semibold text-slate-200 cursor-pointer hover:text-white transition">${item.item_name}</label>
+          div.innerHTML = `
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" id="chk_${index}" data-print-index="${index}" class="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 h-4 w-4 bg-slate-900 cursor-pointer">
+                <label for="chk_${index}" class="text-sm font-semibold text-slate-200 cursor-pointer hover:text-white transition">${item.item_name}</label>
+              </div>
+              <span class="text-[11px] font-mono text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">${item.statutory_rule_citation || 'Statutory Requirement'}</span>
             </div>
-            <span class="text-[11px] font-mono text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">${item.statutory_rule_citation || 'Statutory Requirement'}</span>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed ml-6.5">${item.description}</p>
-          
-          <!-- Collapsible Pitfalls -->
-          <div class="mt-1 pt-2 border-t border-slate-800/80">
-            <div class="text-xs font-semibold text-amber-300/90 mb-1.5 flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              Common Reasons for Rejection:
+            <p class="text-xs text-slate-300 leading-relaxed ml-6.5">${item.description}</p>
+            
+            <!-- Collapsible Pitfalls -->
+            <div class="mt-1 pt-2 border-t border-slate-800/80">
+              <div class="text-xs font-semibold text-amber-300/90 mb-1.5 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Common Reasons for Rejection:
+              </div>
+              <ul class="space-y-1 pl-1">
+                ${pitfallsHtml}
+              </ul>
             </div>
-            <ul class="space-y-1 pl-1">
-              ${pitfallsHtml}
-            </ul>
-          </div>
-        `;
-        evidenceList.appendChild(div);
-      });
+          `;
+          evidenceList.appendChild(div);
+        });
+      }
 
       renderPrintSheet(report);
 
