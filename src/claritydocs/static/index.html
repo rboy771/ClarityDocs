@@ -11,7 +11,7 @@
     @media print {
       @page {
         size: A4;
-        margin: 18mm 16mm;
+        margin: 0;
       }
 
       .no-print,
@@ -26,7 +26,7 @@
         color: #111827 !important;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         font-size: 10.5pt !important;
-        line-height: 1.45 !important;
+        line-height: 1.5 !important;
         min-height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
@@ -37,46 +37,45 @@
       }
 
       .print-sheet {
+        padding: 20mm 18mm;
         width: 100%;
+        box-sizing: border-box;
         color: #111827;
       }
 
       .print-header {
-        border-bottom: 2px solid #111827;
+        border-bottom: 1.5px solid #111827;
         padding-bottom: 10px;
         margin-bottom: 18px;
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
+        align-items: baseline;
       }
 
       .print-title {
-        font-size: 16pt;
+        font-size: 15pt;
         font-weight: 700;
         color: #111827;
         margin: 0;
-        line-height: 1.2;
       }
 
       .print-authority {
         font-size: 10pt;
-        color: #4b5563;
-        margin-top: 3px;
+        color: #374151;
+        margin-top: 2px;
       }
 
       .print-meta {
-        text-align: right;
-        font-size: 8.5pt;
+        font-size: 9pt;
         color: #4b5563;
-        line-height: 1.4;
       }
 
       .print-section-heading {
-        font-size: 10pt;
+        font-size: 9.5pt;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.04em;
-        color: #111827;
+        color: #374151;
         border-bottom: 1px solid #d1d5db;
         padding-bottom: 4px;
         margin: 18px 0 10px 0;
@@ -92,34 +91,28 @@
         display: flex;
         justify-content: space-between;
         align-items: baseline;
+        gap: 16px;
         font-weight: 600;
-        font-size: 11pt;
+        font-size: 10.5pt;
       }
 
       .print-deadline-due {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         font-size: 9.5pt;
         font-weight: 600;
         color: #111827;
+        white-space: nowrap;
       }
 
       .print-deadline-note {
         font-size: 9.5pt;
         color: #374151;
-        margin-top: 2px;
+        margin-top: 3px;
       }
 
       .print-item {
         padding: 10px 0 12px 0;
         border-bottom: 1px solid #e5e7eb;
         page-break-inside: avoid;
-      }
-
-      .print-item-header {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 12px;
       }
 
       .print-item-left {
@@ -155,16 +148,15 @@
         color: #111827;
       }
 
-      .print-citation {
-        font-size: 8.5pt;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        color: #4b5563;
-        white-space: nowrap;
-      }
-
       .print-item-body {
         margin-left: 21px;
-        margin-top: 4px;
+        margin-top: 3px;
+      }
+
+      .print-citation {
+        font-size: 8.5pt;
+        color: #6b7280;
+        margin-bottom: 4px;
       }
 
       .print-item-desc {
@@ -184,21 +176,11 @@
         margin: 0;
         padding-left: 16px;
         font-size: 9pt;
-        color: #4b5563;
+        color: #374151;
       }
 
       .print-pitfalls li {
         margin-bottom: 2px;
-      }
-
-      .print-footer {
-        margin-top: 22px;
-        padding-top: 8px;
-        border-top: 1px solid #d1d5db;
-        font-size: 8pt;
-        color: #6b7280;
-        display: flex;
-        justify-content: space-between;
       }
     }
   </style>
@@ -335,22 +317,14 @@
         <h1 class="print-title">Action & Evidence Checklist</h1>
         <div id="printAuthority" class="print-authority"></div>
       </div>
-      <div class="print-meta">
-        <div id="printDate"></div>
-        <div id="printRedactions"></div>
-      </div>
+      <div id="printDate" class="print-meta"></div>
     </div>
 
-    <div class="print-section-heading">1. Deadlines</div>
+    <div class="print-section-heading">Deadlines</div>
     <div id="printDeadlines"></div>
 
-    <div class="print-section-heading">2. Required Evidence & Rules to Check</div>
+    <div class="print-section-heading">Required Evidence</div>
     <div id="printEvidence"></div>
-
-    <div class="print-footer">
-      <span>Prepared with ClarityDocs (local PII redaction enabled)</span>
-      <span>Take this sheet if speaking with Citizens Advice or an immigration/welfare adviser</span>
-    </div>
   </section>
 
   <!-- Frontend Logic -->
@@ -586,8 +560,7 @@ Failure to submit evidence within 14 days may result in refusal without refund.`
 
     function renderPrintSheet(report) {
       document.getElementById('printAuthority').textContent = report.issuing_body;
-      document.getElementById('printDate').textContent = `Generated: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-      document.getElementById('printRedactions').textContent = `${report.redacted_items_count} PII identifiers scrubbed`;
+      document.getElementById('printDate').textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
       const printDeadlines = document.getElementById('printDeadlines');
       printDeadlines.innerHTML = report.deadlines.map(d => {
@@ -598,7 +571,6 @@ Failure to submit evidence within 14 days may result in refusal without refund.`
           else if (d.days_remaining === 0) statusParts.push('Due today');
           else statusParts.push(`${d.days_remaining} days left`);
         }
-        statusParts.push(d.urgency.toUpperCase());
 
         return `
           <div class="print-deadline-row">
@@ -616,14 +588,12 @@ Failure to submit evidence within 14 days may result in refusal without refund.`
         const pitfalls = item.common_pitfalls.map(p => `<li>${p}</li>`).join('');
         return `
           <div class="print-item">
-            <div class="print-item-header">
-              <div class="print-item-left">
-                <span id="print_box_${idx}" class="print-box"></span>
-                <span class="print-item-title">${item.item_name}</span>
-              </div>
-              <span class="print-citation">${item.statutory_rule_citation || ''}</span>
+            <div class="print-item-left">
+              <span id="print_box_${idx}" class="print-box"></span>
+              <span class="print-item-title">${item.item_name}</span>
             </div>
             <div class="print-item-body">
+              ${item.statutory_rule_citation ? `<div class="print-citation">${item.statutory_rule_citation}</div>` : ''}
               <div class="print-item-desc">${item.description}</div>
               <div class="print-pitfalls-label">Check before sending:</div>
               <ul class="print-pitfalls">${pitfalls}</ul>
