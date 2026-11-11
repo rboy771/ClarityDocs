@@ -1,0 +1,43 @@
+name: ClarityDocs CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test-and-benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+
+    - name: Sync dependencies
+      run: uv sync
+
+    - name: Seed SQLite FTS5 Database
+      run: |
+        export PYTHONPATH=src
+        uv run python src/claritydocs/db/seed.py
+
+    - name: Run Pytest Test Suite
+      run: |
+        export PYTHONPATH=src
+        uv run pytest -v
+
+    - name: Run 25-Case Statutory Benchmark Suite
+      run: |
+        export PYTHONPATH=src
+        uv run python src/claritydocs/benchmark.py

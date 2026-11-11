@@ -34,7 +34,10 @@ def calculate_deadline(
 
     due_date = letter_date + timedelta(days=window_days)
     days_remaining = (due_date - today).days
-    if days_remaining <= 7:
+
+    if days_remaining < 0:
+        urgency = UrgencyLevel.EXPIRED
+    elif days_remaining <= 7:
         urgency = UrgencyLevel.CRITICAL
     elif days_remaining <= 28:
         urgency = UrgencyLevel.WARNING

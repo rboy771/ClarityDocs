@@ -1,0 +1,277 @@
+[
+  {
+    "id": "euss_01_pre_settled_transition",
+    "category": "EU Settlement Scheme",
+    "text": "UK Visas and Immigration\nDate: 10 November 2026\nRef: EUSS-99281726\nApplicant NI: JH112233B\nWe are reviewing your application to switch from pre-settled to settled status under the EU Settlement Scheme. You must provide evidence of continuous residence for 5 years. Please submit your P60 certificates or HMRC employment records within 28 days of this notice.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["EU Settlement Scheme (EUSS) Continuous Residence"],
+      "expected_days": 28,
+      "min_redactions": 2
+    }
+  },
+  {
+    "id": "euss_02_euss_absence_inquiry",
+    "category": "EU Settlement Scheme",
+    "text": "Home Office - European Casework\nDate: 2 November 2026\nRef: GWF088776655\nPostcode: SW1P 4DF\nUnder Appendix EU, you must explain your continuous residence gaps for settled status. If you do not reply with proof within 14 days, your application may be refused.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["EU Settlement Scheme (EUSS) Continuous Residence"],
+      "expected_days": 14,
+      "min_redactions": 2
+    }
+  },
+  {
+    "id": "euss_03_euss_late_applicant",
+    "category": "EU Settlement Scheme",
+    "text": "UKVI - EU Settlement Scheme Resolution Centre\nRef: 1212-3344-5566-7788\nDate of notice: 5 November 2026\nRegarding your late application for settled status, submit proof of continuous residence and reasonable grounds for late submission within 28 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["EU Settlement Scheme (EUSS) Continuous Residence"],
+      "expected_days": 28,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "euss_04_euss_expired_notice",
+    "category": "EU Settlement Scheme",
+    "text": "Home Office UKVI\nDate: 1 October 2026\nRef: GWF011223344\nNI: AB998877C\nProvide P60 or council tax bills proving continuous residence under the EU Settlement Scheme within 14 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["EU Settlement Scheme (EUSS) Continuous Residence"],
+      "expected_days": 14,
+      "min_redactions": 2
+    }
+  },
+  {
+    "id": "euss_05_euss_standard_check",
+    "category": "EU Settlement Scheme",
+    "text": "UK Visas and Immigration\nDate: 8 November 2026\nPlease provide your European pre-settled status reference and evidence of continuous residence within 28 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["EU Settlement Scheme (EUSS) Continuous Residence"],
+      "expected_days": 28,
+      "min_redactions": 0
+    }
+  },
+  {
+    "id": "student_06_bank_statements_funds",
+    "category": "Student & Graduate",
+    "text": "UK Visas and Immigration\nDate: 9 November 2026\nCase Ref: GWF098765432\nNI: AB123456C\nPlease provide official bank statements showing adequate maintenance funds for at least 28 days. You have 14 days from the date of this letter to provide these documents.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Bank Statements & Maintenance Funds"],
+      "expected_days": 14,
+      "min_redactions": 2
+    }
+  },
+  {
+    "id": "student_07_tb_test_certificate",
+    "category": "Student & Graduate",
+    "text": "Home Office UKVI\nDate: 6 November 2026\nRef: GWF055443322\nPhone: 07700 900123\nYou must submit an authorized Tuberculosis TB certificate from an approved medical clinic within 28 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Tuberculosis (TB) Medical Clearance"],
+      "expected_days": 28,
+      "min_redactions": 2
+    }
+  },
+  {
+    "id": "student_08_both_tb_and_finance",
+    "category": "Student & Graduate",
+    "text": "UK Visas and Immigration\nDate: 4 November 2026\nRef: 1212-0001-9999-8888\nProvide official monthly bank statements proving maintenance cash savings and a valid TB medical certificate. Submit within 14 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Bank Statements & Maintenance Funds", "Tuberculosis (TB) Medical Clearance"],
+      "expected_days": 14,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "student_09_expired_maintenance",
+    "category": "Student & Graduate",
+    "text": "UK Visas and Immigration\nDate: 15 September 2026\nNI: CD123456D\nProvide 28 days of bank statements showing maintenance funds within 14 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Bank Statements & Maintenance Funds"],
+      "expected_days": 14,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "student_10_funds_warning_window",
+    "category": "Student & Graduate",
+    "text": "Home Office - Student Route\nDate: 1 November 2026\nRef: GWF077665544\nPlease supply your bank statement showing savings held consecutively within 28 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Bank Statements & Maintenance Funds"],
+      "expected_days": 28,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "work_11_cos_salary_threshold",
+    "category": "Skilled Worker",
+    "text": "UK Visas and Immigration\nDate: 7 November 2026\nRef: GWF012398745\nNI: EF112233A\nYour Certificate of Sponsorship CoS indicates a salary below the required minimum salary threshold for your SOC code. Submit an updated contract or clarification within 14 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Certificate of Sponsorship & Minimum Salary"],
+      "expected_days": 14,
+      "min_redactions": 2
+    }
+  },
+  {
+    "id": "work_12_sponsor_licence_issue",
+    "category": "Skilled Worker",
+    "text": "Home Office UKVI\nDate: 3 November 2026\nRef: GWF099887766\nYour employer's sponsor licence is currently suspended. Under Appendix Skilled Worker, you have 28 days to find an alternative Certificate of Sponsorship CoS.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Certificate of Sponsorship & Minimum Salary"],
+      "expected_days": 28,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "work_13_skilled_worker_and_english",
+    "category": "Skilled Worker",
+    "text": "UK Visas and Immigration\nDate: 5 November 2026\nRef: GWF033221144\nSubmit your valid assigned Certificate of Sponsorship CoS and proof of English language proficiency at level B1 within 28 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Certificate of Sponsorship & Minimum Salary", "English Language Proficiency (SELT)"],
+      "expected_days": 28,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "work_14_soc_code_clarification",
+    "category": "Skilled Worker",
+    "text": "Home Office - Work Operations\nDate: 8 November 2026\nPostcode: EC1A 1BB\nClarify your job duties under the specified SOC code and provide your Certificate of Sponsorship CoS within 14 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Certificate of Sponsorship & Minimum Salary"],
+      "expected_days": 14,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "work_15_expired_cos_request",
+    "category": "Skilled Worker",
+    "text": "UK Visas and Immigration\nDate: 1 October 2026\nRef: GWF001122334\nProvide your Certificate of Sponsorship CoS meeting the salary threshold within 14 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Certificate of Sponsorship & Minimum Salary"],
+      "expected_days": 14,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "family_16_accommodation_tenancy",
+    "category": "Family & Spouse",
+    "text": "UK Visas and Immigration\nDate: 9 November 2026\nRef: GWF044556677\nPostcode: M1 1AA\nWe require evidence of adequate accommodation for your spouse visa. Please provide a signed tenancy agreement or landlord letter confirming no overcrowding within 28 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Adequate Accommodation Evidence"],
+      "expected_days": 28,
+      "min_redactions": 2
+    }
+  },
+  {
+    "id": "family_17_english_proficiency_selt",
+    "category": "Family & Spouse",
+    "text": "Home Office UKVI\nDate: 4 November 2026\nRef: GWF088990011\nApplicant must provide proof of English language proficiency through an approved SELT test provider at CEFR level within 14 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["English Language Proficiency (SELT)"],
+      "expected_days": 14,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "family_18_accommodation_and_selt",
+    "category": "Family & Spouse",
+    "text": "UK Visas and Immigration\nDate: 2 November 2026\nRef: 1212-4455-6677-8899\nPlease send your tenancy agreement confirming adequate accommodation and your IELTS SELT English certificate within 28 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Adequate Accommodation Evidence", "English Language Proficiency (SELT)"],
+      "expected_days": 28,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "family_19_landlord_permission_urgent",
+    "category": "Family & Spouse",
+    "text": "Home Office - Family Entry Clearance\nDate: 10 November 2026\nRef: GWF011998822\nProvide a landlord permission letter for housing accommodation within 14 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Adequate Accommodation Evidence"],
+      "expected_days": 14,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "family_20_expired_accommodation_request",
+    "category": "Family & Spouse",
+    "text": "UK Visas and Immigration\nDate: 20 September 2026\nRef: GWF077889900\nSupply your tenancy lease agreement confirming adequate accommodation within 14 days.",
+    "expected": {
+      "issuing_body": "UK Visas and Immigration (Home Office)",
+      "expected_evidence": ["Adequate Accommodation Evidence"],
+      "expected_days": 14,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "dwp_21_pip_zero_points_dispute",
+    "category": "Benefits & DWP",
+    "text": "Department for Work and Pensions (DWP)\nPersonal Independence Payment (PIP) Decision Notice\nDate: 2 November 2026\nNational Insurance: CD654321D\nWe looked at your claim again. You scored 0 points. If you disagree, you can ask for a mandatory reconsideration. You must write to us within one calendar month of this letter.",
+    "expected": {
+      "issuing_body": "Department for Work and Pensions (DWP)",
+      "expected_evidence": ["DWP Mandatory Reconsideration"],
+      "expected_days": 30,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "dwp_22_pip_mobility_dispute",
+    "category": "Benefits & DWP",
+    "text": "Department for Work and Pensions\nDate: 5 November 2026\nNI: GH998811A\nRegarding your PIP appeal, if you dispute the points awarded for moving around, request a mandatory reconsideration within 1 calendar month.",
+    "expected": {
+      "issuing_body": "Department for Work and Pensions (DWP)",
+      "expected_evidence": ["DWP Mandatory Reconsideration"],
+      "expected_days": 30,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "dwp_23_expired_pip_decision",
+    "category": "Benefits & DWP",
+    "text": "DWP - Disability Service Centre\nDate: 15 August 2026\nNI: KL445566B\nYour PIP award has ended. You have one calendar month to request a mandatory reconsideration.",
+    "expected": {
+      "issuing_body": "Department for Work and Pensions (DWP)",
+      "expected_evidence": ["DWP Mandatory Reconsideration"],
+      "expected_days": 30,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "council_24_tax_hardship_section13a",
+    "category": "Council & Local Authority",
+    "text": "Cardiff City Council - Revenues Division\nDate: 6 November 2026\nPostcode: CF10 3ND\nFinal Recovery Notice for Council Tax arrears. If you are experiencing exceptional hardship, you may apply for Section 13A council tax reduction within 14 days before bailiff action.",
+    "expected": {
+      "issuing_body": "Local Authority Council",
+      "expected_evidence": ["Council Tax Hardship Relief (Section 13A)"],
+      "expected_days": 14,
+      "min_redactions": 1
+    }
+  },
+  {
+    "id": "council_25_tax_liability_warning",
+    "category": "Council & Local Authority",
+    "text": "Manchester City Council\nDate: 8 November 2026\nRef: CT-99001122\nPostcode: M60 2LA\nNotice of liability order summons. To request discretionary hardship reduction under section 13a, submit your income and expenditure within 28 days.",
+    "expected": {
+      "issuing_body": "Local Authority Council",
+      "expected_evidence": ["Council Tax Hardship Relief (Section 13A)"],
+      "expected_days": 28,
+      "min_redactions": 1
+    }
+  }
+]

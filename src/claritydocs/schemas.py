@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class UrgencyLevel(str, Enum):
+    EXPIRED = "expired"    # Deadline has already passed (< 0 days remaining)
     CRITICAL = "critical"  # <= 7 days or strict legal cut-off
     WARNING = "warning"    # <= 28 days
     INFO = "info"          # Standard action or informational

@@ -14,8 +14,8 @@ PASSPORT_REGEX = re.compile(r"\b[0-9]{9}\b")
 # UK Postcode regex
 POSTCODE_REGEX = re.compile(r"\b[A-Z]{1,2}[0-9][A-Z0-9]?\s?[0-9][A-Z]{2}\b", re.IGNORECASE)
 
-# Home Office / UKVI Case reference patterns (e.g. 1212-0001-1234-5678, HO/1234567, GWF012345678)
-HO_REF_REGEX = re.compile(r"\b(GWF\d{9}|HO/\d{6,8}|\d{4}-\d{4}-\d{4}-\d{4})\b", re.IGNORECASE)
+# Home Office / UKVI Case reference patterns (e.g. 1212-0001-1234-5678, HO/1234567, GWF012345678, EUSS-12345678)
+HO_REF_REGEX = re.compile(r"\b(EUSS-\d{6,10}|GWF\d{9}|HO/\d{6,8}|\d{4}-\d{4}-\d{4}-\d{4})\b", re.IGNORECASE)
 
 # UK Phone numbers
 PHONE_REGEX = re.compile(r"\b(?:\+44\s?|0)(?:7\d{3}|\d{4})\s?\d{6}\b")

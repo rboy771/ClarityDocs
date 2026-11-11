@@ -18,7 +18,7 @@ def test_deadline_future():
 
 def test_deadline_overdue():
     # Letter issued 1 Oct 2026, 14-day window -> due 15 Oct 2026
-    # Today is 11 Nov 2026 -> -27 days remaining -> CRITICAL
+    # Today is 11 Nov 2026 -> -27 days remaining -> EXPIRED
     letter_date = date(2026, 10, 1)
     today = date(2026, 11, 11)
     
@@ -26,4 +26,4 @@ def test_deadline_overdue():
     
     assert due_date == date(2026, 10, 15)
     assert days_left == -27
-    assert urgency == UrgencyLevel.CRITICAL
+    assert urgency == UrgencyLevel.EXPIRED

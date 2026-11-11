@@ -91,6 +91,19 @@ INITIAL_RULES = [
             "Failure to include full household income and expenditure breakdown.",
             "Delaying application until a liability order or court summons has already been executed."
         ])
+    },
+    {
+        "rule_id": "eu_settlement_scheme_euss",
+        "rule_name": "EU Settlement Scheme (EUSS) Continuous Residence",
+        "category": "mandatory_document",
+        "citation": "UKVI Appendix EU, Annex 1 (Continuous Qualifying Period)",
+        "description": "Evidence of 5 years continuous residence in the UK (with no absence exceeding 6 months in any 12-month period) to transition from pre-settled to settled status.",
+        "keywords": "eu settlement scheme euss settled status pre-settled european continuous residence p60 council tax bills hmrc employment",
+        "pitfalls": json.dumps([
+            "Absence from the UK of more than 6 months in any 12-month period without a statutory permitted reason (e.g. serious illness, study).",
+            "Submitting annual utility bills that do not cover the entire multi-year residence timeline.",
+            "Missing the late application reasonable grounds criteria if applying beyond the original deadline."
+        ])
     }
 ]
 
