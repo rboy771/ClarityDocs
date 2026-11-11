@@ -1,12 +1,12 @@
 [project]
 name = "claritydocs"
 version = "0.1.0"
-description = "Add your description here"
+description = "Privacy-preserving document breakdown engine for UK immigration and statutory notices"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.162.4",
-    "httpx>=0.28.1",
+    "httpx2>=2.16.0",
     "pydantic>=2.14.3",
     "pydantic-settings>=2.16.2",
     "pypdf>=7.0.1",
@@ -14,3 +14,6 @@ dependencies = [
     "python-multipart>=0.0.33",
     "uvicorn>=0.54.0",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

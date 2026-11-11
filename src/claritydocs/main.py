@@ -1,9 +1,16 @@
+from typing import Annotated
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from claritydocs.schemas import BreakdownReport
 from claritydocs.sanitizer import LocalPrivacySanitizer
 from claritydocs.extractor import DocumentIngestionService
 from claritydocs.matcher import StatutoryRuleMatcher
+
+
+class TextAnalysisRequest(BaseModel):
+    text: str
+
 
 app = FastAPI(
     title="ClarityDocs API",
@@ -30,18 +37,19 @@ def health():
 
 
 @app.post("/api/v1/analyze-text", response_model=BreakdownReport)
-def analyze_text(text: str):
-    if not text.strip():
+def analyze_text(payload: TextAnalysisRequest | None = None, text: str | None = None):
+    raw_input = payload.text if payload else (text or "")
+    if not raw_input.strip():
         raise HTTPException(status_code=400, detail="Text cannot be empty.")
     
-    clean_text, redactions = sanitizer.sanitize(text)
+    clean_text, redactions = sanitizer.sanitize(raw_input)
     report = matcher.analyze_and_match(clean_text, len(redactions))
     return report
 
 
 @app.post("/api/v1/analyze-pdf", response_model=BreakdownReport)
-async def analyze_pdf(file: UploadFile = File(...)):
-    if not file.filename.lower().endswith(".pdf"):
+async def analyze_pdf(file: Annotated[UploadFile, File(description="PDF notice to analyze")]):
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
     
     content = await file.read()

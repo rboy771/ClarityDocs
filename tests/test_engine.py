@@ -47,7 +47,7 @@ def test_analyze_ukvi_further_evidence_letter():
     If you do not reply within 14 days, your application may be refused.
     """
 
-    response = client.post("/api/v1/analyze-text", params={"text": ukvi_letter})
+    response = client.post("/api/v1/analyze-text", json={"text": ukvi_letter})
     assert response.status_code == 200
     data = response.json()
 
