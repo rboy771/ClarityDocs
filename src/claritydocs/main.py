@@ -1,6 +1,9 @@
+from pathlib import Path
 from typing import Annotated
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from claritydocs.schemas import BreakdownReport
 from claritydocs.sanitizer import LocalPrivacySanitizer
@@ -27,8 +30,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
 sanitizer = LocalPrivacySanitizer()
 matcher = StatutoryRuleMatcher()
+
+
+@app.get("/")
+def serve_index():
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return {"service": "ClarityDocs", "message": "Visit /docs for the API or place index.html in static/"}
 
 
 @app.get("/health")

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClarityDocs — UK Statutory Notice Breakdown Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; color: black !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Navigation / Header -->
+  <header class="border-b border-slate-800 bg-slate-900/70 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
+          CD
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold tracking-tight text-white flex items-center gap-2">
+            ClarityDocs
+            <span class="text-xs font-mono uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Privacy Shield Active</span>
+          </h1>
+          <p class="text-xs text-slate-400">UK Visas & Immigration (UKVI) & Statutory Benefit Notice Breakdown Engine</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4 no-print">
+        <a href="/docs" target="_blank" class="text-xs text-slate-400 hover:text-slate-200 transition">API Docs</a>
+        <a href="https://github.com/rboy771/ClarityDocs" target="_blank" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-md font-medium transition">GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- Left Column: Upload & Input Panel -->
+    <section class="lg:col-span-5 flex flex-col gap-6 no-print">
+      
+      <!-- Privacy Assurance Card -->
+      <div class="bg-indigo-950/30 border border-indigo-500/20 rounded-xl p-4">
+        <h2 class="text-sm font-semibold text-indigo-300 flex items-center gap-2">
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Zero-PII Local Shield
+        </h2>
+        <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+          National Insurance numbers, postcodes, Home Office reference numbers, and phone numbers are redacted automatically before analysis.
+        </p>
+      </div>
+
+      <!-- PDF Dropzone -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+        <h3 class="text-sm font-semibold text-slate-200 mb-2">Option 1: Upload Notice PDF</h3>
+        <div id="dropzone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-lg p-6 text-center cursor-pointer transition bg-slate-950/50">
+          <svg class="w-10 h-10 mx-auto text-slate-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          <p class="text-xs font-medium text-slate-300">Drag & drop your official letter PDF here</p>
+          <p class="text-xs text-slate-500 mt-1">or click to browse your files</p>
+          <input type="file" id="pdfFileInput" accept="application/pdf" class="hidden">
+        </div>
+        <div id="uploadStatus" class="mt-2 text-xs text-indigo-400 hidden font-mono"></div>
+      </div>
+
+      <!-- Paste Text Option -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col gap-3">
+        <h3 class="text-sm font-semibold text-slate-200">Option 2: Paste Notice Text</h3>
+        <textarea id="noticeTextInput" rows="8" placeholder="Paste the text of your Home Office UKVI, DWP, or Council notice here..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono"></textarea>
+        
+        <div class="flex items-center justify-between">
+          <button id="sampleBtn" class="text-xs text-slate-400 hover:text-slate-200 transition underline">
+            Load sample UKVI letter
+          </button>
+          <button id="analyzeBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-4 py-2 rounded-lg transition shadow-md shadow-indigo-600/20 flex items-center gap-2">
+            <span>Analyze Notice</span>
+            <svg id="spinner" class="w-3.5 h-3.5 animate-spin hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Right Column: Breakdown & Action Plan -->
+    <section class="lg:col-span-7 flex flex-col gap-6">
+
+      <!-- Placeholder empty state -->
+      <div id="emptyState" class="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center my-auto">
+        <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-400 mb-3">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <h3 class="text-sm font-semibold text-slate-200">No Document Analyzed Yet</h3>
+        <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Upload a notice PDF or paste text on the left to extract deadlines, calculate remaining days, and view statutory checklists.</p>
+      </div>
+
+      <!-- Results Container (Hidden until analysis) -->
+      <div id="resultsContainer" class="hidden flex flex-col gap-6">
+
+        <!-- Notice Meta & Authority Banner -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="authorityTag" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">UK Visas & Immigration</span>
+              <span id="redactionBadge" class="text-xs text-emerald-400 font-mono">0 PII Redacted</span>
+            </div>
+            <h2 id="reportTitle" class="text-base font-semibold text-white mt-1">Official Statutory Notice Review</h2>
+            <p id="reportSummary" class="text-xs text-slate-400 mt-0.5"></p>
+          </div>
+          <button onclick="window.print()" class="no-print bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-3 py-1.5 rounded-md font-medium transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            Print Checklist
+          </button>
+        </div>
+
+        <!-- Deadlines Section -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+          <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Critical Deadlines & Windows</h3>
+          <div id="deadlinesList" class="flex flex-col gap-3"></div>
+        </div>
+
+        <!-- Statutory Evidence Requirements & Pitfalls -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+          <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Required Evidence & Legal Rules (FTS5 Grounded)</h3>
+          <div id="evidenceList" class="flex flex-col gap-4"></div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500 no-print">
+    ClarityDocs — Open-source UK Statutory Notice Breakdown Engine · <a href="https://github.com/rboy771/ClarityDocs" class="hover:text-slate-400 transition">MIT License</a>
+  </footer>
+
+  <!-- Frontend Logic -->
+  <script>
+    const sampleText = `Home Office - UK Visas and Immigration
+Case Ref: GWF098765432
+Applicant NI: AB123456C
+Date: 10 November 2026
+
+We are reviewing your application for Leave to Remain.
+To make a decision, we require the following documents:
+1. Official bank statements covering a consecutive 28-day period proving maintenance funds.
+2. An authorized Tuberculosis (TB) medical certificate from an approved diagnostic clinic.
+
+You must provide this evidence within 14 days of the date of this letter.
+Failure to submit evidence within 14 days may result in refusal without refund.`;
+
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const sampleBtn = document.getElementById('sampleBtn');
+    const noticeInput = document.getElementById('noticeTextInput');
+    const spinner = document.getElementById('spinner');
+    const emptyState = document.getElementById('emptyState');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const dropzone = document.getElementById('dropzone');
+    const pdfFileInput = document.getElementById('pdfFileInput');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    sampleBtn.addEventListener('click', () => {
+      noticeInput.value = sampleText;
+    });
+
+    dropzone.addEventListener('click', () => pdfFileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-indigo-500', 'bg-indigo-950/20');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-indigo-500', 'bg-indigo-950/20');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-indigo-500', 'bg-indigo-950/20');
+      if (e.dataTransfer.files.length > 0) {
+        handlePdfUpload(e.dataTransfer.files[0]);
+      }
+    });
+
+    pdfFileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handlePdfUpload(e.target.files[0]);
+      }
+    });
+
+    async function handlePdfUpload(file) {
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        alert('Please upload a PDF file.');
+        return;
+      }
+
+      uploadStatus.textContent = `Uploading & parsing: ${file.name}...`;
+      uploadStatus.classList.remove('hidden');
+      spinner.classList.remove('hidden');
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/api/v1/analyze-pdf', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Analysis failed');
+        }
+
+        const data = await res.json();
+        renderResults(data);
+        uploadStatus.textContent = `Analyzed: ${file.name}`;
+      } catch (err) {
+        alert(err.message);
+        uploadStatus.classList.add('hidden');
+      } finally {
+        spinner.classList.add('hidden');
+      }
+    }
+
+    analyzeBtn.addEventListener('click', async () => {
+      const text = noticeInput.value.trim();
+      if (!text) {
+        alert('Please enter or paste notice text first.');
+        return;
+      }
+
+      spinner.classList.remove('hidden');
+      analyzeBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/v1/analyze-text', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Analysis failed');
+        }
+
+        const data = await res.json();
+        renderResults(data);
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        spinner.classList.add('hidden');
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    function renderResults(report) {
+      emptyState.classList.add('hidden');
+      resultsContainer.classList.remove('hidden');
+
+      document.getElementById('authorityTag').textContent = report.issuing_body;
+      document.getElementById('redactionBadge').textContent = `${report.redacted_items_count} PII identifiers redacted locally`;
+      document.getElementById('reportTitle').textContent = report.document_title;
+      document.getElementById('reportSummary').textContent = report.summary;
+
+      // Render Deadlines
+      const deadlinesList = document.getElementById('deadlinesList');
+      deadlinesList.innerHTML = '';
+
+      report.deadlines.forEach(d => {
+        let urgencyBadge = '';
+        let cardBorder = 'border-slate-800';
+
+        if (d.urgency === 'expired') {
+          urgencyBadge = '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-xs font-semibold uppercase">EXPIRED</span>';
+          cardBorder = 'border-rose-500/40 bg-rose-950/10';
+        } else if (d.urgency === 'critical') {
+          urgencyBadge = '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-xs font-semibold uppercase">CRITICAL</span>';
+          cardBorder = 'border-rose-500/30 bg-rose-950/10';
+        } else if (d.urgency === 'warning') {
+          urgencyBadge = '<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-xs font-semibold uppercase">WARNING</span>';
+          cardBorder = 'border-amber-500/20';
+        } else {
+          urgencyBadge = '<span class="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded text-xs font-semibold uppercase">STANDARD</span>';
+        }
+
+        let countdownText = '';
+        if (d.days_remaining !== null) {
+          if (d.days_remaining < 0) {
+            countdownText = `<span class="text-rose-400 font-mono font-medium">${Math.abs(d.days_remaining)} days overdue</span>`;
+          } else if (d.days_remaining === 0) {
+            countdownText = `<span class="text-rose-400 font-mono font-medium">Due TODAY</span>`;
+          } else {
+            countdownText = `<span class="text-indigo-400 font-mono font-medium">${d.days_remaining} days left</span>`;
+          }
+        }
+
+        const div = document.createElement('div');
+        div.className = `p-3.5 rounded-lg border ${cardBorder} flex flex-col gap-1.5`;
+        div.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-semibold text-slate-100">${d.title}</span>
+            <div class="flex items-center gap-2">
+              ${countdownText}
+              ${urgencyBadge}
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">${d.statutory_consequence}</p>
+          ${d.due_date ? `<div class="text-[11px] font-mono text-slate-500 mt-0.5">Calculated Expiry Date: ${d.due_date}</div>` : ''}
+        `;
+        deadlinesList.appendChild(div);
+      });
+
+      // Render Evidence
+      const evidenceList = document.getElementById('evidenceList');
+      evidenceList.innerHTML = '';
+
+      report.evidence_checklist.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'border border-slate-800 rounded-lg p-4 bg-slate-950/40 flex flex-col gap-2.5';
+
+        const pitfallsHtml = item.common_pitfalls.map(p => `
+          <li class="flex items-start gap-2 text-xs text-slate-400">
+            <span class="text-rose-400 mt-0.5">✕</span>
+            <span>${p}</span>
+          </li>
+        `).join('');
+
+        div.innerHTML = `
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <input type="checkbox" id="chk_${index}" class="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 h-4 w-4 bg-slate-900 cursor-pointer">
+              <label for="chk_${index}" class="text-sm font-semibold text-slate-200 cursor-pointer hover:text-white transition">${item.item_name}</label>
+            </div>
+            <span class="text-[11px] font-mono text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">${item.statutory_rule_citation || 'Statutory Requirement'}</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed ml-6.5">${item.description}</p>
+          
+          <!-- Collapsible Pitfalls -->
+          <div class="mt-1 pt-2 border-t border-slate-800/80">
+            <div class="text-xs font-semibold text-amber-300/90 mb-1.5 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              Common Reasons for Rejection:
+            </div>
+            <ul class="space-y-1 pl-1">
+              ${pitfallsHtml}
+            </ul>
+          </div>
+        `;
+        evidenceList.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
