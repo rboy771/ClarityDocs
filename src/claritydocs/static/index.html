@@ -3,354 +3,459 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ClarityDocs — UK Statutory Notice Breakdown Engine</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>ClarityDocs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    .print-only { display: none; }
+    :root {
+      --bg: #f9fafb;
+      --surface: #ffffff;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --border-dark: #d1d5db;
+      --accent: #0f172a;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --warning: #b45309;
+      --warning-bg: #fffbeb;
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* Minimal Top Navigation */
+    header {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .header-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .header-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      margin-left: 20px;
+    }
+    .header-links a:hover {
+      color: var(--text);
+    }
+
+    /* Introductory Area */
+    .intro {
+      margin-bottom: 32px;
+    }
+    .intro h1 {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+    .intro p {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 600px;
+    }
+
+    /* Clean Ingestion Card */
+    .input-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .dropzone {
+      border: 1px dashed var(--border-dark);
+      border-radius: 6px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background-color 0.15s;
+      background: #fafafa;
+    }
+    .dropzone:hover {
+      border-color: var(--text);
+      background: #f4f4f5;
+    }
+    .dropzone-label {
+      font-weight: 500;
+      color: var(--text);
+    }
+    .dropzone-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+      color: var(--text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border);
+    }
+    .divider span {
+      padding: 0 12px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      resize: vertical;
+      background: #fafafa;
+      line-height: 1.4;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: #fff;
+    }
+
+    .input-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+    }
+    .btn-sample {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 0;
+      text-decoration: underline;
+    }
+    .btn-sample:hover {
+      color: var(--text);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Output Results (Editorial, Document-Style) */
+    .results {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 32px;
+    }
+
+    .results-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .authority-name {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .summary-text {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .btn-print {
+      background: #ffffff;
+      border: 1px solid var(--border-dark);
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .btn-print:hover {
+      background: #f4f4f5;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin: 28px 0 12px;
+    }
+
+    /* Deadlines List */
+    .deadline-item {
+      padding: 14px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+    .deadline-item.urgent {
+      border-color: #fca5a5;
+      background: var(--danger-bg);
+    }
+    .deadline-item.warning {
+      border-color: #fde68a;
+      background: var(--warning-bg);
+    }
+    .deadline-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-weight: 600;
+    }
+    .deadline-meta {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .deadline-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Evidence List */
+    .evidence-item {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+    .evidence-item:last-child {
+      border-bottom: none;
+    }
+    .evidence-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .evidence-checkbox {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      position: relative;
+      top: 1px;
+    }
+    .evidence-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .evidence-citation {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      margin-left: 26px;
+    }
+    .evidence-desc {
+      font-size: 14px;
+      margin-top: 6px;
+      margin-left: 26px;
+      color: #374151;
+    }
+    .pitfalls-container {
+      margin-top: 10px;
+      margin-left: 26px;
+    }
+    .pitfalls-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .pitfalls-list {
+      padding-left: 16px;
+      font-size: 13px;
+      color: #4b5563;
+    }
+    .pitfalls-list li {
+      margin-bottom: 3px;
+    }
+
+    /* Notice for non-statutory documents */
+    .unrecognized-banner {
+      background: var(--warning-bg);
+      border: 1px solid #fde68a;
+      padding: 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #92400e;
+    }
+
+    /* Clean Print Styles */
     @media print {
       @page {
         size: A4;
-        margin: 0;
+        margin: 18mm 16mm;
       }
-
-      .no-print,
-      header,
-      main,
-      footer {
+      body {
+        background: #fff !important;
+        font-size: 10pt !important;
+      }
+      header, .intro, .input-section, .btn-print, .no-print {
         display: none !important;
       }
-
-      html, body {
-        background: #ffffff !important;
-        color: #111827 !important;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-        font-size: 10.5pt !important;
-        line-height: 1.5 !important;
-        min-height: auto !important;
-        margin: 0 !important;
+      .container {
+        max-width: 100% !important;
         padding: 0 !important;
       }
-
-      .print-only {
-        display: block !important;
+      .results {
+        border: none !important;
+        padding: 0 !important;
       }
-
-      .print-sheet {
-        padding: 20mm 18mm;
-        width: 100%;
-        box-sizing: border-box;
-        color: #111827;
+      .results-header {
+        border-bottom: 1.5px solid #111 !important;
+        padding-bottom: 8px !important;
       }
-
-      .print-header {
-        border-bottom: 1.5px solid #111827;
-        padding-bottom: 10px;
-        margin-bottom: 18px;
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-      }
-
-      .print-title {
-        font-size: 15pt;
-        font-weight: 700;
-        color: #111827;
-        margin: 0;
-      }
-
-      .print-authority {
-        font-size: 10pt;
-        color: #374151;
-        margin-top: 2px;
-      }
-
-      .print-meta {
-        font-size: 9pt;
-        color: #4b5563;
-      }
-
-      .print-section-heading {
-        font-size: 9.5pt;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: #374151;
-        border-bottom: 1px solid #d1d5db;
-        padding-bottom: 4px;
-        margin: 18px 0 10px 0;
-      }
-
-      .print-deadline-row {
-        padding: 8px 0;
-        border-bottom: 1px solid #e5e7eb;
-        page-break-inside: avoid;
-      }
-
-      .print-deadline-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        gap: 16px;
-        font-weight: 600;
-        font-size: 10.5pt;
-      }
-
-      .print-deadline-due {
-        font-size: 9.5pt;
-        font-weight: 600;
-        color: #111827;
-        white-space: nowrap;
-      }
-
-      .print-deadline-note {
-        font-size: 9.5pt;
-        color: #374151;
-        margin-top: 3px;
-      }
-
-      .print-item {
-        padding: 10px 0 12px 0;
-        border-bottom: 1px solid #e5e7eb;
-        page-break-inside: avoid;
-      }
-
-      .print-item-left {
-        display: flex;
-        align-items: baseline;
-        gap: 9px;
-      }
-
-      .print-box {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        border: 1.5px solid #111827;
-        border-radius: 2px;
-        position: relative;
-        top: 1px;
-        flex-shrink: 0;
-      }
-
-      .print-box.checked::after {
-        content: "✓";
-        position: absolute;
-        top: -4px;
-        left: 1px;
-        font-size: 11pt;
-        font-weight: 700;
-        color: #111827;
-      }
-
-      .print-item-title {
-        font-size: 11pt;
-        font-weight: 700;
-        color: #111827;
-      }
-
-      .print-item-body {
-        margin-left: 21px;
-        margin-top: 3px;
-      }
-
-      .print-citation {
-        font-size: 8.5pt;
-        color: #6b7280;
-        margin-bottom: 4px;
-      }
-
-      .print-item-desc {
-        font-size: 9.5pt;
-        color: #1f2937;
-        margin-bottom: 6px;
-      }
-
-      .print-pitfalls-label {
-        font-size: 8.5pt;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 2px;
-      }
-
-      .print-pitfalls {
-        margin: 0;
-        padding-left: 16px;
-        font-size: 9pt;
-        color: #374151;
-      }
-
-      .print-pitfalls li {
-        margin-bottom: 2px;
+      .deadline-item {
+        background: none !important;
+        border: 1px solid #ddd !important;
       }
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+<body>
 
-  <!-- Navigation / Header -->
-  <header class="border-b border-slate-800 bg-slate-900/70 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
-          CD
-        </div>
-        <div>
-          <h1 class="text-lg font-semibold tracking-tight text-white flex items-center gap-2">
-            ClarityDocs
-            <span class="text-xs font-mono uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Privacy Shield Active</span>
-          </h1>
-          <p class="text-xs text-slate-400">UK Visas & Immigration (UKVI) & Statutory Benefit Notice Breakdown Engine</p>
-        </div>
-      </div>
-      <div class="flex items-center space-x-4 no-print">
-        <a href="/docs" target="_blank" class="text-xs text-slate-400 hover:text-slate-200 transition">API Docs</a>
-        <a href="https://github.com/rboy771/ClarityDocs" target="_blank" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-md font-medium transition">GitHub</a>
+  <header class="no-print">
+    <div class="header-inner">
+      <div class="brand">ClarityDocs</div>
+      <div class="header-links">
+        <a href="/docs" target="_blank">API Reference</a>
+        <a href="https://github.com/rboy771/ClarityDocs" target="_blank">GitHub</a>
       </div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+  <main class="container">
 
-    <!-- Left Column: Upload & Input Panel -->
-    <section class="lg:col-span-5 flex flex-col gap-6 no-print">
-      
-      <!-- Privacy Assurance Card -->
-      <div class="bg-indigo-950/30 border border-indigo-500/20 rounded-xl p-4">
-        <h2 class="text-sm font-semibold text-indigo-300 flex items-center gap-2">
-          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          Zero-PII Local Shield
-        </h2>
-        <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-          National Insurance numbers, postcodes, Home Office reference numbers, and phone numbers are redacted automatically before analysis.
-        </p>
+    <div class="intro no-print">
+      <h1>UK Notice Action Checklist</h1>
+      <p>Drop a letter from UKVI, Home Office, DWP, or your local council to check deadlines, identify required evidence, and avoid common rejection reasons.</p>
+    </div>
+
+    <!-- Upload & Input Area -->
+    <section class="input-section no-print">
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-label">Drop official letter PDF here</div>
+        <div class="dropzone-sub">or click to choose a file from your computer</div>
+        <input type="file" id="pdfFileInput" accept="application/pdf" style="display: none;">
       </div>
+      <div id="uploadStatus" style="font-size: 13px; color: var(--text-muted); margin-top: 8px; display: none;"></div>
 
-      <!-- PDF Dropzone -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-        <h3 class="text-sm font-semibold text-slate-200 mb-2">Option 1: Upload Notice PDF</h3>
-        <div id="dropzone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-lg p-6 text-center cursor-pointer transition bg-slate-950/50">
-          <svg class="w-10 h-10 mx-auto text-slate-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-          <p class="text-xs font-medium text-slate-300">Drag & drop your official letter PDF here</p>
-          <p class="text-xs text-slate-500 mt-1">or click to browse your files</p>
-          <input type="file" id="pdfFileInput" accept="application/pdf" class="hidden">
-        </div>
-        <div id="uploadStatus" class="mt-2 text-xs text-indigo-400 hidden font-mono"></div>
+      <div class="divider"><span>or paste letter text</span></div>
+
+      <textarea id="noticeTextInput" placeholder="Paste the text from your letter here..."></textarea>
+
+      <div class="input-actions">
+        <button id="sampleBtn" class="btn-sample" type="button">Load sample letter</button>
+        <button id="analyzeBtn" class="btn-primary" type="button">Review Letter</button>
       </div>
-
-      <!-- Paste Text Option -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col gap-3">
-        <h3 class="text-sm font-semibold text-slate-200">Option 2: Paste Notice Text</h3>
-        <textarea id="noticeTextInput" rows="8" placeholder="Paste the text of your Home Office UKVI, DWP, or Council notice here..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono"></textarea>
-        
-        <div class="flex items-center justify-between">
-          <button id="sampleBtn" class="text-xs text-slate-400 hover:text-slate-200 transition underline">
-            Load sample UKVI letter
-          </button>
-          <button id="analyzeBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-4 py-2 rounded-lg transition shadow-md shadow-indigo-600/20 flex items-center gap-2">
-            <span>Analyze Notice</span>
-            <svg id="spinner" class="w-3.5 h-3.5 animate-spin hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-          </button>
-        </div>
-      </div>
-
     </section>
 
-    <!-- Right Column: Breakdown & Action Plan -->
-    <section class="lg:col-span-7 flex flex-col gap-6">
-
-      <!-- Placeholder empty state -->
-      <div id="emptyState" class="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center my-auto">
-        <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-400 mb-3">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    <!-- Results Area -->
+    <section id="resultsArea" class="results" style="display: none;">
+      <div class="results-header">
+        <div>
+          <div id="authorityName" class="authority-name"></div>
+          <div id="summaryText" class="summary-text"></div>
         </div>
-        <h3 class="text-sm font-semibold text-slate-200">No Document Analyzed Yet</h3>
-        <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Upload a notice PDF or paste text on the left to extract deadlines, calculate remaining days, and view statutory checklists.</p>
+        <button class="btn-print no-print" onclick="window.print()" type="button">Print Checklist</button>
       </div>
 
-      <!-- Results Container (Hidden until analysis) -->
-      <div id="resultsContainer" class="hidden flex flex-col gap-6">
-
-        <!-- Notice Meta & Authority Banner -->
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div class="flex items-center gap-2">
-              <span id="authorityTag" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">UK Visas & Immigration</span>
-              <span id="redactionBadge" class="text-xs text-emerald-400 font-mono">0 PII Redacted</span>
-            </div>
-            <h2 id="reportTitle" class="text-base font-semibold text-white mt-1">Official Statutory Notice Review</h2>
-            <p id="reportSummary" class="text-xs text-slate-400 mt-0.5"></p>
-          </div>
-          <button onclick="window.print()" class="no-print bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-3 py-1.5 rounded-md font-medium transition flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-            Print Checklist
-          </button>
-        </div>
-
-        <!-- Deadlines Section -->
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
-          <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Critical Deadlines & Windows</h3>
-          <div id="deadlinesList" class="flex flex-col gap-3"></div>
-        </div>
-
-        <!-- Statutory Evidence Requirements & Pitfalls -->
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
-          <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Required Evidence & Legal Rules (FTS5 Grounded)</h3>
-          <div id="evidenceList" class="flex flex-col gap-4"></div>
-        </div>
-
+      <div id="deadlinesArea">
+        <div class="section-title">Deadlines</div>
+        <div id="deadlinesList"></div>
       </div>
 
+      <div id="evidenceArea">
+        <div class="section-title">Required Evidence & Verification Rules</div>
+        <div id="evidenceList"></div>
+      </div>
+
+      <div id="unrecognizedArea" style="display: none;">
+        <div class="unrecognized-banner" id="unrecognizedText"></div>
+      </div>
     </section>
 
   </main>
 
-  <!-- Footer -->
-  <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500 no-print">
-    ClarityDocs — Open-source UK Statutory Notice Breakdown Engine · <a href="https://github.com/rboy771/ClarityDocs" class="hover:text-slate-400 transition">MIT License</a>
-  </footer>
-
-  <!-- Dedicated Clean Print Sheet (only visible when printing) -->
-  <section id="printSheet" class="print-only print-sheet">
-    <div class="print-header">
-      <div>
-        <h1 class="print-title">Action & Evidence Checklist</h1>
-        <div id="printAuthority" class="print-authority"></div>
-      </div>
-      <div id="printDate" class="print-meta"></div>
-    </div>
-
-    <div class="print-section-heading">Deadlines</div>
-    <div id="printDeadlines"></div>
-
-    <div class="print-section-heading">Required Evidence</div>
-    <div id="printEvidence"></div>
-  </section>
-
-  <!-- Frontend Logic -->
   <script>
     const sampleText = `Home Office - UK Visas and Immigration
-Case Ref: GWF098765432
-Applicant NI: AB123456C
-Date: 10 November 2026
+Date of letter: 10 November 2026
+Our reference: GWF012345678
 
-We are reviewing your application for Leave to Remain.
+We are considering your application for permission to stay.
 To make a decision, we require the following documents:
 1. Official bank statements covering a consecutive 28-day period proving maintenance funds.
 2. An authorized Tuberculosis (TB) medical certificate from an approved diagnostic clinic.
 
 You must provide this evidence within 14 days of the date of this letter.
-Failure to submit evidence within 14 days may result in refusal without refund.`;
+Failure to submit evidence within 14 days may result in refusal.`;
 
     const analyzeBtn = document.getElementById('analyzeBtn');
     const sampleBtn = document.getElementById('sampleBtn');
     const noticeInput = document.getElementById('noticeTextInput');
-    const spinner = document.getElementById('spinner');
-    const emptyState = document.getElementById('emptyState');
-    const resultsContainer = document.getElementById('resultsContainer');
     const dropzone = document.getElementById('dropzone');
     const pdfFileInput = document.getElementById('pdfFileInput');
     const uploadStatus = document.getElementById('uploadStatus');
+    const resultsArea = document.getElementById('resultsArea');
 
     sampleBtn.addEventListener('click', () => {
       noticeInput.value = sampleText;
@@ -360,16 +465,19 @@ Failure to submit evidence within 14 days may result in refusal without refund.`
 
     dropzone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropzone.classList.add('border-indigo-500', 'bg-indigo-950/20');
+      dropzone.style.borderColor = '#111827';
+      dropzone.style.backgroundColor = '#f4f4f5';
     });
 
     dropzone.addEventListener('dragleave', () => {
-      dropzone.classList.remove('border-indigo-500', 'bg-indigo-950/20');
+      dropzone.style.borderColor = '#d1d5db';
+      dropzone.style.backgroundColor = '#fafafa';
     });
 
     dropzone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropzone.classList.remove('border-indigo-500', 'bg-indigo-950/20');
+      dropzone.style.borderColor = '#d1d5db';
+      dropzone.style.backgroundColor = '#fafafa';
       if (e.dataTransfer.files.length > 0) {
         handlePdfUpload(e.dataTransfer.files[0]);
       }
@@ -382,239 +490,115 @@ Failure to submit evidence within 14 days may result in refusal without refund.`
     });
 
     async function handlePdfUpload(file) {
-      if (!file.name.toLowerCase().endsWith('.pdf')) {
-        alert('Please upload a PDF file.');
-        return;
-      }
-
-      uploadStatus.textContent = `Uploading & parsing: ${file.name}...`;
-      uploadStatus.classList.remove('hidden');
-      spinner.classList.remove('hidden');
+      uploadStatus.textContent = `Reading ${file.name}...`;
+      uploadStatus.style.display = 'block';
+      analyzeBtn.disabled = true;
 
       const formData = new FormData();
       formData.append('file', file);
 
       try {
-        const res = await fetch('/api/v1/analyze-pdf', {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.detail || 'Analysis failed');
-        }
-
+        const res = await fetch('/api/v1/analyze-pdf', { method: 'POST', body: formData });
+        if (!res.ok) throw new Error((await res.json()).detail || 'Failed to read PDF');
         const data = await res.json();
         renderResults(data);
-        uploadStatus.textContent = `Analyzed: ${file.name}`;
+        uploadStatus.textContent = `Completed: ${file.name}`;
       } catch (err) {
         alert(err.message);
-        uploadStatus.classList.add('hidden');
+        uploadStatus.style.display = 'none';
       } finally {
-        spinner.classList.add('hidden');
+        analyzeBtn.disabled = false;
       }
     }
 
     analyzeBtn.addEventListener('click', async () => {
       const text = noticeInput.value.trim();
       if (!text) {
-        alert('Please enter or paste notice text first.');
+        alert('Please paste letter text or drop a PDF.');
         return;
       }
 
-      spinner.classList.remove('hidden');
       analyzeBtn.disabled = true;
-
       try {
         const res = await fetch('/api/v1/analyze-text', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text })
         });
-
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.detail || 'Analysis failed');
-        }
-
+        if (!res.ok) throw new Error((await res.json()).detail || 'Failed to analyze text');
         const data = await res.json();
         renderResults(data);
       } catch (err) {
         alert(err.message);
       } finally {
-        spinner.classList.add('hidden');
         analyzeBtn.disabled = false;
       }
     });
 
     function renderResults(report) {
-      emptyState.classList.add('hidden');
-      resultsContainer.classList.remove('hidden');
+      resultsArea.style.display = 'block';
 
-      // Check if document was unrecognized
-      const isUnrecognized = report.issuing_body.includes('Unknown') || report.document_title === 'Unrecognized Document';
-      const authorityTag = document.getElementById('authorityTag');
-      
-      authorityTag.textContent = report.issuing_body;
+      const isUnrecognized = report.issuing_body.includes('Unknown');
+      document.getElementById('authorityName').textContent = report.issuing_body;
+      document.getElementById('summaryText').textContent = report.summary;
+
+      const deadlinesArea = document.getElementById('deadlinesArea');
+      const evidenceArea = document.getElementById('evidenceArea');
+      const unrecognizedArea = document.getElementById('unrecognizedArea');
+
       if (isUnrecognized) {
-        authorityTag.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20';
-      } else {
-        authorityTag.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
+        deadlinesArea.style.display = 'none';
+        evidenceArea.style.display = 'none';
+        unrecognizedArea.style.display = 'block';
+        document.getElementById('unrecognizedText').textContent = report.summary;
+        return;
       }
 
-      document.getElementById('redactionBadge').textContent = `${report.redacted_items_count} PII identifiers redacted locally`;
-      document.getElementById('reportTitle').textContent = report.document_title;
-      document.getElementById('reportSummary').textContent = report.summary;
+      unrecognizedArea.style.display = 'none';
+      deadlinesArea.style.display = 'block';
+      evidenceArea.style.display = 'block';
 
       // Render Deadlines
       const deadlinesList = document.getElementById('deadlinesList');
-      deadlinesList.innerHTML = '';
-
-      if (report.deadlines.length === 0) {
-        deadlinesList.innerHTML = '<div class="text-xs text-slate-400 italic">No legal deadlines or statutory response windows found.</div>';
-      } else {
-        report.deadlines.forEach(d => {
-          let urgencyBadge = '';
-          let cardBorder = 'border-slate-800';
-
-          if (d.urgency === 'expired') {
-            urgencyBadge = '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-xs font-semibold uppercase">EXPIRED</span>';
-            cardBorder = 'border-rose-500/40 bg-rose-950/10';
-          } else if (d.urgency === 'critical') {
-            urgencyBadge = '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-xs font-semibold uppercase">CRITICAL</span>';
-            cardBorder = 'border-rose-500/30 bg-rose-950/10';
-          } else if (d.urgency === 'warning') {
-            urgencyBadge = '<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-xs font-semibold uppercase">WARNING</span>';
-            cardBorder = 'border-amber-500/20';
-          } else {
-            urgencyBadge = '<span class="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded text-xs font-semibold uppercase">STANDARD</span>';
-          }
-
-          let countdownText = '';
-          if (d.days_remaining !== null) {
-            if (d.days_remaining < 0) {
-              countdownText = `<span class="text-rose-400 font-mono font-medium">${Math.abs(d.days_remaining)} days overdue</span>`;
-            } else if (d.days_remaining === 0) {
-              countdownText = `<span class="text-rose-400 font-mono font-medium">Due TODAY</span>`;
-            } else {
-              countdownText = `<span class="text-indigo-400 font-mono font-medium">${d.days_remaining} days left</span>`;
-            }
-          }
-
-          const div = document.createElement('div');
-          div.className = `p-3.5 rounded-lg border ${cardBorder} flex flex-col gap-1.5`;
-          div.innerHTML = `
-            <div class="flex items-center justify-between">
-              <span class="text-sm font-semibold text-slate-100">${d.title}</span>
-              <div class="flex items-center gap-2">
-                ${countdownText}
-                ${urgencyBadge}
-              </div>
-            </div>
-            <p class="text-xs text-slate-400 leading-relaxed">${d.statutory_consequence}</p>
-            ${d.due_date ? `<div class="text-[11px] font-mono text-slate-500 mt-0.5">Calculated Expiry Date: ${d.due_date}</div>` : ''}
-          `;
-          deadlinesList.appendChild(div);
-        });
-      }
-
-      // Render Evidence
-      const evidenceList = document.getElementById('evidenceList');
-      evidenceList.innerHTML = '';
-
-      if (report.evidence_checklist.length === 0) {
-        evidenceList.innerHTML = '<div class="text-xs text-slate-400 italic">No statutory documentation requirements identified.</div>';
-      } else {
-        report.evidence_checklist.forEach((item, index) => {
-          const div = document.createElement('div');
-          div.className = 'border border-slate-800 rounded-lg p-4 bg-slate-950/40 flex flex-col gap-2.5';
-
-          const pitfallsHtml = item.common_pitfalls.map(p => `
-            <li class="flex items-start gap-2 text-xs text-slate-400">
-              <span class="text-rose-400 mt-0.5">✕</span>
-              <span>${p}</span>
-            </li>
-          `).join('');
-
-          div.innerHTML = `
-            <div class="flex items-start justify-between gap-3">
-              <div class="flex items-center gap-2.5">
-                <input type="checkbox" id="chk_${index}" data-print-index="${index}" class="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 h-4 w-4 bg-slate-900 cursor-pointer">
-                <label for="chk_${index}" class="text-sm font-semibold text-slate-200 cursor-pointer hover:text-white transition">${item.item_name}</label>
-              </div>
-              <span class="text-[11px] font-mono text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">${item.statutory_rule_citation || 'Statutory Requirement'}</span>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed ml-6.5">${item.description}</p>
-            
-            <!-- Collapsible Pitfalls -->
-            <div class="mt-1 pt-2 border-t border-slate-800/80">
-              <div class="text-xs font-semibold text-amber-300/90 mb-1.5 flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                Common Reasons for Rejection:
-              </div>
-              <ul class="space-y-1 pl-1">
-                ${pitfallsHtml}
-              </ul>
-            </div>
-          `;
-          evidenceList.appendChild(div);
-        });
-      }
-
-      renderPrintSheet(report);
-
-      // Keep print checkboxes synced with interactive screen checkboxes
-      evidenceList.querySelectorAll('input[type="checkbox"]').forEach(chk => {
-        chk.addEventListener('change', (e) => {
-          const idx = e.target.getAttribute('data-print-index');
-          const printBox = document.getElementById(`print_box_${idx}`);
-          if (printBox) {
-            printBox.classList.toggle('checked', e.target.checked);
-          }
-        });
-      });
-    }
-
-    function renderPrintSheet(report) {
-      document.getElementById('printAuthority').textContent = report.issuing_body;
-      document.getElementById('printDate').textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-
-      const printDeadlines = document.getElementById('printDeadlines');
-      printDeadlines.innerHTML = report.deadlines.map(d => {
-        let statusParts = [];
-        if (d.due_date) statusParts.push(`Due ${d.due_date}`);
+      deadlinesList.innerHTML = report.deadlines.map(d => {
+        let meta = [];
+        if (d.due_date) meta.push(`Due ${d.due_date}`);
         if (d.days_remaining !== null) {
-          if (d.days_remaining < 0) statusParts.push(`${Math.abs(d.days_remaining)} days overdue`);
-          else if (d.days_remaining === 0) statusParts.push('Due today');
-          else statusParts.push(`${d.days_remaining} days left`);
+          if (d.days_remaining < 0) meta.push(`${Math.abs(d.days_remaining)} days overdue`);
+          else if (d.days_remaining === 0) meta.push('Due today');
+          else meta.push(`${d.days_remaining} days left`);
         }
 
+        let cls = 'deadline-item';
+        if (d.urgency === 'expired' || d.urgency === 'critical') cls += ' urgent';
+        else if (d.urgency === 'warning') cls += ' warning';
+
         return `
-          <div class="print-deadline-row">
-            <div class="print-deadline-top">
+          <div class="${cls}">
+            <div class="deadline-top">
               <span>${d.title}</span>
-              <span class="print-deadline-due">${statusParts.join(' · ')}</span>
+              <span class="deadline-meta">${meta.join(' · ')}</span>
             </div>
-            <div class="print-deadline-note">${d.statutory_consequence}</div>
+            <div class="deadline-desc">${d.statutory_consequence}</div>
           </div>
         `;
       }).join('');
 
-      const printEvidence = document.getElementById('printEvidence');
-      printEvidence.innerHTML = report.evidence_checklist.map((item, idx) => {
+      // Render Evidence
+      const evidenceList = document.getElementById('evidenceList');
+      evidenceList.innerHTML = report.evidence_checklist.map(item => {
         const pitfalls = item.common_pitfalls.map(p => `<li>${p}</li>`).join('');
         return `
-          <div class="print-item">
-            <div class="print-item-left">
-              <span id="print_box_${idx}" class="print-box"></span>
-              <span class="print-item-title">${item.item_name}</span>
+          <div class="evidence-item">
+            <div class="evidence-header">
+              <input type="checkbox" class="evidence-checkbox">
+              <div class="evidence-title">${item.item_name}</div>
             </div>
-            <div class="print-item-body">
-              ${item.statutory_rule_citation ? `<div class="print-citation">${item.statutory_rule_citation}</div>` : ''}
-              <div class="print-item-desc">${item.description}</div>
-              <div class="print-pitfalls-label">Check before sending:</div>
-              <ul class="print-pitfalls">${pitfalls}</ul>
+            ${item.statutory_rule_citation ? `<div class="evidence-citation">${item.statutory_rule_citation}</div>` : ''}
+            <div class="evidence-desc">${item.description}</div>
+            <div class="pitfalls-container">
+              <div class="pitfalls-label">Reasons applications get refused:</div>
+              <ul class="pitfalls-list">${pitfalls}</ul>
             </div>
           </div>
         `;
