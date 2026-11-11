@@ -2,12 +2,9 @@
 
 > **Privacy-Preserving Document Breakdown Engine for UK Immigration and Statutory Notices**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-black?style=flat&logo=vercel)](https://claritydocs-tawny.vercel.app)
 [![CI Status](https://img.shields.io/badge/CI-Passing-emerald.svg)](https://github.com/rboy771/ClarityDocs/actions)
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
-
-**Live Web Application:** [https://claritydocs-tawny.vercel.app](https://claritydocs-tawny.vercel.app)
 
 ClarityDocs ingests complex, high-stakes government letters (UK Visas & Immigration Home Office notices, DWP Personal Independence Payment decisions, and local authority council rulings). It scrubs personal identifying information (PII) before analysis, extracts critical deadlines, and maps document requirements against indexed statutory rules.
 
