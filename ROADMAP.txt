@@ -1,0 +1,155 @@
+================================================================================
+CLARITYDOCS — FULL PROJECT ROADMAP & IMPLEMENTATION BLUEPRINT
+================================================================================
+
+1. PROJECT SUMMARY & OBJECTIVE
+--------------------------------------------------------------------------------
+ClarityDocs is a privacy-first document analysis engine designed to break down
+dense, high-stakes UK immigration (Home Office UKVI) letters and statutory benefit 
+(DWP PIP, Universal Credit, Council) notices into plain English action items.
+
+Core features:
+- Strips personal identifiable information (PII) before analysis.
+- Extracts real calendar deadlines and calculates urgency levels.
+- Searches statutory rules via full-text search (SQLite FTS5) to provide official citations.
+- Flags common refusal pitfalls so users do not submit invalid evidence.
+- Offers an interactive, accessible web interface with an exportable checklist.
+- Includes an empirical evaluation benchmark measuring extraction recall.
+
+
+2. WORKSPACE & ENVIRONMENT LOCATIONS
+--------------------------------------------------------------------------------
+Project Code Repository:
+  O:\GITHUB-Repo\ClarityDocs\
+
+Persistent Knowledge & Brain Notes (Obsidian):
+  O:\Vault\theVault\Projects\ClarityDocs\
+    ├── ClarityDocs Overview.md
+    ├── Architecture\
+    │   └── System Architecture.md
+    └── Systems\
+
+Environment & Tooling:
+  - Python 3.12 (CPython managed by uv)
+  - Package manager: uv
+  - Framework: FastAPI + Uvicorn
+  - Data validation: Pydantic v2
+  - PDF Ingestion: pypdf
+  - Testing: pytest
+  - Database: SQLite with FTS5 extension (built into Python standard library)
+
+
+3. COMPLETE STEP-BY-STEP ROADMAP
+--------------------------------------------------------------------------------
+
+PHASE 1: FOUNDATION & CORE PARSING ENGINE [COMPLETED]
+-----------------------------------------------------
+[x] 1.1 Repository initialization with uv, git config, and dependencies.
+[x] 1.2 Local Privacy Shield (`sanitizer.py`):
+        Regex-based redaction for NI numbers, UK postcodes, Home Office GWF refs,
+        and telephone numbers.
+[x] 1.3 Data Schemas (`schemas.py`):
+        Strict Pydantic models for DeadlineItem, EvidenceRequirement, UrgencyLevel,
+        and BreakdownReport.
+[x] 1.4 PDF Ingestion (`extractor.py`):
+        Extracts clean per-page text from binary PDF uploads.
+[x] 1.5 Calendar & Deadline Math (`dates.py`):
+        `calculate_deadline` and `extract_letter_date` using dateutil and timedelta.
+[x] 1.6 FastAPI Service (`main.py`):
+        Endpoints: GET /health, POST /api/v1/analyze-text, POST /api/v1/analyze-pdf.
+[x] 1.7 Initial Pytest Suite (`tests/test_dates.py`, `tests/test_engine.py`):
+        5 unit tests passing cleanly.
+
+
+PHASE 2: STATUTORY KNOWLEDGE BASE & SQLITE FTS5 SEARCH [NEXT UP]
+----------------------------------------------------------------
+Objective: Replace static Python keyword dictionaries with an indexed SQLite FTS5 
+retrieval engine for official UKVI and DWP statutory paragraphs.
+
+Tasks to execute in order:
+[ ] 2.1 Seed Database Definition (`src/claritydocs/db/schema.sql`):
+        Define the virtual table using FTS5:
+        `CREATE VIRTUAL TABLE statutory_rules USING fts5(rule_name, category, citation, requirements, pitfalls);`
+[ ] 2.2 Seed Data Population (`src/claritydocs/db/seed.py`):
+        Ingest official rule entries:
+        - UKVI Appendix Finance (FIN 2.1 to 8.1: 28-day consecutive bank balance rule)
+        - UKVI Appendix FM & Part 8 (Adequate accommodation, landlord permission)
+        - UKVI Appendix English Language (SELT B1/B2, authorized test centres)
+        - UKVI Appendix T (Tuberculosis medical certificate from approved clinics)
+        - UKVI Appendix Skilled Worker (Minimum salary thresholds and SOC codes)
+        - DWP Social Security Act 1998 (1 calendar month Mandatory Reconsideration)
+        - Council Tax Reduction Section 13A (Local authority hardship appeals)
+[ ] 2.3 Search Service Implementation (`src/claritydocs/db/search.py`):
+        Write BM25 ranked full-text queries against SQLite FTS5.
+        Given input text tokens, return top matching citations and common rejection pitfalls.
+[ ] 2.4 Integrate FTS5 into Matcher (`src/claritydocs/matcher.py`):
+        Replace static dictionary loops with the dynamic FTS5 search service.
+[ ] 2.5 Tests for Database & Retrieval (`tests/test_db_search.py`):
+        Verify that phrasing variations (e.g. "bank balance", "28 days statement") 
+        retrieve the exact statutory citation.
+
+
+PHASE 3: COMPREHENSIVE BENCHMARK & EVALUATION HARNESS
+-----------------------------------------------------
+Objective: Give the portfolio repository measurable proof of accuracy and recall.
+
+Tasks:
+[ ] 3.1 Expand Benchmark Test Cases (`src/claritydocs/benchmark.py`):
+        Expand from 3 cases to 25 synthetic official letters covering:
+        - Skilled worker refusal letters
+        - Graduate route further evidence requests
+        - Spouse visa accommodation notices
+        - DWP PIP 0-point decision notices
+        - Universal credit sanction warning letters
+[ ] 3.2 Evaluation Metrics Calculator:
+        Calculate and print an evaluation table:
+        - Statutory Evidence Recall (%)
+        - Deadline Calculation Accuracy (%)
+        - False Positive / Hallucination Rate (%)
+        - PII Redaction Success Rate (%)
+[ ] 3.3 CI Pipeline Automation (`.github/workflows/ci.yml`):
+        Run `uv run pytest` and `uv run python src/claritydocs/benchmark.py` 
+        automatically on every GitHub push.
+
+
+PHASE 4: USER INTERFACE (WEB CLIENT)
+------------------------------------
+Objective: Provide an accessible, clean browser interface to demo the tool live.
+
+Tasks:
+[ ] 4.1 Frontend Architecture Setup:
+        Lightweight React or clean HTML5/Tailwind SPA served directly or via Vite.
+[ ] 4.2 File Drag-and-Drop Dropzone:
+        Accepts PDF documents or pasted letter text.
+[ ] 4.3 In-Browser PII Preview & Toggle:
+        Visually displays what information was redacted before submission.
+[ ] 4.4 Urgent Timeline Banner:
+        Color-coded deadline badge (Crimson Red for <= 7 days, Warning Amber, Neutral Slate).
+[ ] 4.5 Interactive Evidence Checklist:
+        Checkboxes for each required document (`Got it`, `Requested`, `Missing`).
+        Collapsible "Common Rejection Pitfalls" cards with legal citations.
+[ ] 4.6 Printable / Exportable Action Summary:
+        One-click printable PDF or plain text summary to take to a solicitor or Citizens Advice.
+
+
+PHASE 5: DEPLOYMENT, GIT POLISH & PORTFOLIO PACKAGING
+-----------------------------------------------------
+Objective: Make the project public, live on the internet, and ready for recruiters.
+
+Tasks:
+[ ] 5.1 Dockerfile containerization (`Dockerfile`).
+[ ] 5.2 Free Cloud Deployment (Railway / Render / Fly.io):
+        Publish with a live public URL.
+[ ] 5.3 README Architecture Diagram & Benchmark Table:
+        Include the ASCII workflow diagram, benchmark metrics table, and live demo link.
+[ ] 5.4 Push to GitHub (`gh repo create ClarityDocs --public`).
+[ ] 5.5 Pin repo to your GitHub profile header.
+
+
+4. WORKING CONVENTIONS FOR PAIR PROGRAMMING
+--------------------------------------------------------------------------------
+- Clean code only: no hardcoded personal details or sensitive keys.
+- Write tests alongside each new feature.
+- Verify everything with `uv run pytest` before committing.
+- Commit messages follow standard conventional commit syntax (`feat:`, `fix:`, `refactor:`).
+================================================================================

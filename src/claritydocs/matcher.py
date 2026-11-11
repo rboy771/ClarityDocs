@@ -7,71 +7,15 @@ from claritydocs.schemas import (
     UrgencyLevel,
     RequirementType,
 )
-
-
-STATUTORY_RULES_DB = [
-    {
-        "keywords": ["bank statement", "funds", "maintenance", "savings", "financial requirement"],
-        "name": "Bank Statements & Financial Proof",
-        "type": RequirementType.FINANCIAL_EVIDENCE,
-        "citation": "UKVI Appendix Finance, Paragraph FIN 2.1 to FIN 8.1",
-        "description": "Must show consecutive funds held for at least 28 days ending no more than 31 days before application date.",
-        "pitfalls": [
-            "Funds dropped below required threshold even for a single day during the 28-day window.",
-            "Statements do not display account holder name, account number, or bank logo.",
-            "Using mini-statements or ad-hoc ATM receipts instead of official formal statements.",
-            "Closing statement date is more than 31 days older than the application submission date."
-        ]
-    },
-    {
-        "keywords": ["tb", "tuberculosis", "medical certificate", "chest x-ray"],
-        "name": "Tuberculosis (TB) Certificate",
-        "type": RequirementType.MANDATORY_DOCUMENT,
-        "citation": "UKVI Appendix T: Tuberculosis screening",
-        "description": "Certificate from an approved Home Office diagnostic clinic confirming clearance.",
-        "pitfalls": [
-            "Test was taken at an unaccredited clinic not listed on the official UKVI designated clinics panel.",
-            "Certificate has passed its 6-month validity period."
-        ]
-    },
-    {
-        "keywords": ["english language", "ielts", "b1", "b2", "selt", "degree taught in english"],
-        "name": "Proof of English Language Proficiency",
-        "type": RequirementType.MANDATORY_DOCUMENT,
-        "citation": "UKVI Appendix English Language (EL 1.1)",
-        "description": "Passed an approved Secure English Language Test (SELT) at CEFR level or Ecctis confirmation.",
-        "pitfalls": [
-            "Certificate is from an unapproved provider (must be IELTS SELT Consortium, LanguageCert, Pearson, or PSI).",
-            "Missing the unique reference number (URN) needed by the case worker to verify online."
-        ]
-    },
-    {
-        "keywords": ["tenancy", "accommodation", "landlord", "property inspection", "living arrangement"],
-        "name": "Adequate Accommodation Evidence",
-        "type": RequirementType.MANDATORY_DOCUMENT,
-        "citation": "UKVI Immigration Rules: Part 8 & Appendix FM",
-        "description": "Proof that housing is not overcrowded and complies with UK Public Health Acts.",
-        "pitfalls": [
-            "Missing landlord letter permitting the applicant to reside at the premises.",
-            "Failure to include a property inspection report for shared accommodations."
-        ]
-    },
-    {
-        "keywords": ["pip", "personal independence payment", "dwp", "mandatory reconsideration", "appeal"],
-        "name": "Mandatory Reconsideration Request (DWP)",
-        "type": RequirementType.FORM_SUBMISSION,
-        "citation": "Social Security Act 1998, Section 12 & DWP Decision Making Guidance",
-        "description": "Formal written request disputing a benefit decision within 1 calendar month of decision letter.",
-        "pitfalls": [
-            "Submitting beyond the 1-calendar-month deadline without an official 'good cause' explanation.",
-            "Not providing new medical evidence directly matching the specific PIP descriptors scored 0."
-        ]
-    }
-]
+from claritydocs.dates import extract_letter_date, calculate_deadline
+from claritydocs.db.search import StatutorySearchService
 
 
 class StatutoryRuleMatcher:
-    """Matches text against statutory immigration and benefit rules."""
+    """Matches text against statutory immigration and benefit rules using SQLite FTS5."""
+
+    def __init__(self, search_service: StatutorySearchService | None = None):
+        self.search_service = search_service or StatutorySearchService()
 
     def analyze_and_match(self, sanitized_text: str, redaction_count: int) -> BreakdownReport:
         lower_text = sanitized_text.lower()
@@ -87,41 +31,66 @@ class StatutoryRuleMatcher:
         elif "council" in lower_text:
             issuing_body = "Local Authority Council"
 
-        # 2. Extract Deadlines
+        # 2. Extract Letter Date and Calculate Deadlines
+        detected_date = extract_letter_date(sanitized_text)
         deadlines: List[DeadlineItem] = []
-        
-        # Check for 14-day appeal / response notice
+
+        # Check for 14-day window
         if re.search(r"\b14\s+days?\b", lower_text):
+            if detected_date:
+                due_date, days_left, urgency = calculate_deadline(detected_date, 14)
+                due_date_str = due_date.isoformat()
+            else:
+                due_date_str = None
+                days_left = 14
+                urgency = UrgencyLevel.CRITICAL
+
             deadlines.append(
                 DeadlineItem(
                     title="14-Day Response / Appeal Window",
-                    due_date=None,
-                    days_remaining=14,
-                    urgency=UrgencyLevel.CRITICAL,
+                    due_date=due_date_str,
+                    days_remaining=days_left,
+                    urgency=urgency,
                     statutory_consequence="Failure to submit evidence within 14 days will result in the application being decided on existing papers or rejected."
                 )
             )
 
-        # Check for 28-day statutory notice
+        # Check for 28-day window
         if re.search(r"\b28\s+days?\b", lower_text):
+            if detected_date:
+                due_date, days_left, urgency = calculate_deadline(detected_date, 28)
+                due_date_str = due_date.isoformat()
+            else:
+                due_date_str = None
+                days_left = 28
+                urgency = UrgencyLevel.WARNING
+
             deadlines.append(
                 DeadlineItem(
                     title="28-Day Evidence Submission Window",
-                    due_date=None,
-                    days_remaining=28,
-                    urgency=UrgencyLevel.WARNING,
+                    due_date=due_date_str,
+                    days_remaining=days_left,
+                    urgency=urgency,
                     statutory_consequence="Application may be treated as withdrawn or refused without refund."
                 )
             )
 
-        # Check for 1 calendar month (DWP / Council mandatory reconsideration)
+        # Check for 1 calendar month
         if re.search(r"\b(?:one|1)\s+(?:calendar\s+)?month\b", lower_text):
+            if detected_date:
+                due_date, days_left, urgency = calculate_deadline(detected_date, 30)
+                due_date_str = due_date.isoformat()
+            else:
+                due_date_str = None
+                days_left = 30
+                urgency = UrgencyLevel.WARNING
+
             deadlines.append(
                 DeadlineItem(
                     title="1 Calendar Month Mandatory Reconsideration",
-                    due_date=None,
-                    days_remaining=30,
-                    urgency=UrgencyLevel.WARNING,
+                    due_date=due_date_str,
+                    days_remaining=days_left,
+                    urgency=urgency,
                     statutory_consequence="Right to dispute the decision lapses; late reconsideration requires formal proof of special circumstances."
                 )
             )
@@ -137,19 +106,28 @@ class StatutoryRuleMatcher:
                 )
             )
 
-        # 3. Match Statutory Evidence Requirements
+        # 3. Match Statutory Evidence Requirements via SQLite FTS5
         matched_evidence: List[EvidenceRequirement] = []
-        for rule in STATUTORY_RULES_DB:
-            if any(kw in lower_text for kw in rule["keywords"]):
-                matched_evidence.append(
-                    EvidenceRequirement(
-                        item_name=rule["name"],
-                        requirement_type=rule["type"],
-                        description=rule["description"],
-                        statutory_rule_citation=rule["citation"],
-                        common_pitfalls=rule["pitfalls"]
-                    )
+        db_results = self.search_service.search_rules(sanitized_text, limit=4)
+        
+        for rule in db_results:
+            req_type = RequirementType.MANDATORY_DOCUMENT
+            if rule["category"] == "financial_evidence":
+                req_type = RequirementType.FINANCIAL_EVIDENCE
+            elif rule["category"] == "form_submission":
+                req_type = RequirementType.FORM_SUBMISSION
+            elif rule["category"] == "biometric_or_interview":
+                req_type = RequirementType.BIOMETRIC_OR_INTERVIEW
+
+            matched_evidence.append(
+                EvidenceRequirement(
+                    item_name=rule["rule_name"],
+                    requirement_type=req_type,
+                    description=rule["description"],
+                    statutory_rule_citation=rule["citation"],
+                    common_pitfalls=rule["pitfalls"]
                 )
+            )
 
         summary = f"Parsed {issuing_body} communication. Identified {len(deadlines)} timeline constraints and {len(matched_evidence)} statutory documentation requirements."
 

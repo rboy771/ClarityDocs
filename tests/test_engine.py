@@ -58,8 +58,8 @@ def test_analyze_ukvi_further_evidence_letter():
     deadlines = data["deadlines"]
     assert any(d["days_remaining"] == 14 and d["urgency"] == "critical" for d in deadlines)
 
-    # Verify matched statutory rules
+    # Verify matched statutory rules via SQLite FTS5
     checklist = data["evidence_checklist"]
     item_names = [item["item_name"] for item in checklist]
-    assert "Bank Statements & Financial Proof" in item_names
-    assert "Tuberculosis (TB) Certificate" in item_names
+    assert "Bank Statements & Maintenance Funds" in item_names
+    assert "Tuberculosis (TB) Medical Clearance" in item_names
