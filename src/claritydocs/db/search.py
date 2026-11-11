@@ -1,65 +1,98 @@
-import sqlite3
 import json
 import re
+import sqlite3
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List, Optional, Set
 
 DB_PATH = Path(__file__).resolve().parent / "rules.db"
 
+# Words that carry no signal. Two-letter tokens like "tb" and "b2" are kept on purpose,
+# because they are real keywords in the rules table.
+STOP_WORDS = {
+    "the", "and", "for", "with", "that", "this", "from", "you", "your", "have", "are", "not",
+    "of", "in", "to", "is", "be", "by", "an", "as", "at", "it", "on", "or", "if", "do", "no",
+    "we", "us", "our", "will", "must", "can", "may", "any", "all", "has", "was", "were", "been",
+}
+
+TOKEN_RE = re.compile(r"[A-Za-z0-9]{2,}")
+
+# A rule is only returned when at least this many of its distinct keywords appear in the letter.
+# Chosen from observed data: wrong rules on full letters share 1 keyword (e.g. "certificate"),
+# correct rules share 2 on a short snippet and 6 or more on a full letter.
+DEFAULT_MIN_KEYWORD_HITS = 2
+
+
+def tokenize(text: str) -> List[str]:
+    return [t.lower() for t in TOKEN_RE.findall(text) if t.lower() not in STOP_WORDS]
+
+
+def _normalise(token: str) -> str:
+    """Cheap plural folding so 'statements' and 'statement' count as the same keyword."""
+    return token[:-1] if len(token) > 3 and token.endswith("s") else token
+
 
 class StatutorySearchService:
-    """Provides full-text search and BM25 ranking over statutory rules using SQLite FTS5."""
+    """
+    Retrieves statutory rules with SQLite FTS5 (BM25 ranking) and then keeps only the
+    rules that share enough distinct keywords with the letter to be a real match.
+    """
 
     def __init__(self, db_path: Path = DB_PATH):
         self.db_path = db_path
 
-    def _sanitize_query(self, query: str) -> str:
-        """Cleans and extracts meaningful words for FTS5 boolean OR search."""
-        words = re.findall(r"\b[A-Za-z0-9]{3,}\b", query)
-        # Filter out common stop words
-        stop_words = {"the", "and", "for", "with", "that", "this", "from", "you", "your", "have", "are", "not"}
-        filtered = [w for w in words if w.lower() not in stop_words]
-        if not filtered:
+    def _build_fts_query(self, letter_tokens: Set[str]) -> str:
+        if not letter_tokens:
             return ""
-        # Create an OR query for FTS5: e.g. "bank OR statement OR maintenance"
-        return " OR ".join(filtered[:20])
+        # Quote every token so words like OR, AND, NOT, NEAR are never read as FTS5 operators.
+        terms = " OR ".join(f'"{t}"' for t in sorted(letter_tokens))
+        # Search the keywords column only, so common words in descriptions cannot create matches.
+        return f"keywords : ({terms})"
 
-    def search_rules(self, text: str, limit: int = 5) -> List[Dict[str, Any]]:
-        """
-        Executes a BM25 ranked full-text search against the statutory_rules FTS5 table.
-        Returns matching rules sorted by relevance score.
-        """
-        fts_query = self._sanitize_query(text)
+    def search_rules(
+        self,
+        text: str,
+        limit: int = 8,
+        authority: Optional[str] = None,
+        min_keyword_hits: int = DEFAULT_MIN_KEYWORD_HITS,
+    ) -> List[Dict[str, Any]]:
+        letter_tokens = set(tokenize(text))
+        fts_query = self._build_fts_query(letter_tokens)
         if not fts_query:
             return []
 
+        normalised_letter = {_normalise(t) for t in letter_tokens}
+
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-
         try:
-            # bm25(statutory_rules) gives lower scores for better matches in SQLite FTS5
             sql = """
-                SELECT rule_id, rule_name, category, citation, description, pitfalls, bm25(statutory_rules) as score
+                SELECT rule_id, authority, rule_name, category, citation, description,
+                       keywords, pitfalls, bm25(statutory_rules) AS score
                 FROM statutory_rules
                 WHERE statutory_rules MATCH ?
+                  AND (? IS NULL OR authority = ?)
                 ORDER BY score ASC
                 LIMIT ?
             """
-            cursor.execute(sql, (fts_query, limit))
-            rows = cursor.fetchall()
-
-            results = []
-            for row in rows:
-                results.append({
-                    "rule_id": row["rule_id"],
-                    "rule_name": row["rule_name"],
-                    "category": row["category"],
-                    "citation": row["citation"],
-                    "description": row["description"],
-                    "pitfalls": json.loads(row["pitfalls"]),
-                    "relevance_score": row["score"]
-                })
-            return results
+            rows = conn.execute(sql, (fts_query, authority, authority, limit)).fetchall()
         finally:
             conn.close()
+
+        results: List[Dict[str, Any]] = []
+        for row in rows:
+            rule_keywords = {_normalise(t) for t in tokenize(row["keywords"])}
+            hits = rule_keywords & normalised_letter
+            if len(hits) < min_keyword_hits:
+                continue
+            results.append({
+                "rule_id": row["rule_id"],
+                "authority": row["authority"],
+                "rule_name": row["rule_name"],
+                "category": row["category"],
+                "citation": row["citation"],
+                "description": row["description"],
+                "pitfalls": json.loads(row["pitfalls"]),
+                "relevance_score": row["score"],
+                "keyword_hits": sorted(hits),
+            })
+        return results

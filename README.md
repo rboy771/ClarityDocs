@@ -55,12 +55,15 @@ ClarityDocs features an automated quantitative evaluation harness (`src/clarityd
 
 ### Benchmark Performance Summary
 
-| Metric | Baseline Prompt (Raw LLM) | ClarityDocs Grounded FTS5 Engine |
-| :--- | :---: | :---: |
-| **Overall End-to-End Test Pass Rate** | ~58.0% | **100.0% (25/25)** |
-| **Statutory Evidence Recall (BM25)** | 68.4% | **100.0% (28/28 citations)** |
-| **Deadline Calculation Accuracy** | 72.0% | **100.0% (25/25 notices)** |
-| **PII Redaction Coverage (Local)** | Vulnerable | **100.0% (31/31 identifiers)** |
+| Metric | Result |
+| :--- | :---: |
+| Overall end-to-end pass rate | 100.0% (25/25) |
+| Statutory evidence recall | 100.0% (28/28 expected rules found) |
+| Statutory evidence precision | 100.0% (28/28 matched rules were expected) |
+| Due date accuracy | 100.0% (25/25 notices) |
+| PII redaction coverage | 100.0% (31/31 identifiers) |
+
+Limits of this benchmark: the 25 cases are short, hand-written letters, and the matching thresholds were tuned while building it, so the scores are optimistic. Two full-length sample letters (a UKVI evidence request and a DWP PIP decision) are tested separately in `tests/test_sample_pdfs.py`. They found three real bugs that the short cases missed, which are now fixed. No comparison against a raw LLM has been run.
 
 To run the benchmark yourself:
 ```bash

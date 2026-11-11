@@ -30,6 +30,19 @@ def test_privacy_sanitizer():
     assert len(redactions) == 4
 
 
+def test_privacy_sanitizer_handles_wrapped_and_prefixed_references():
+    sanitizer = LocalPrivacySanitizer()
+    # PDF extraction can split a long reference across lines, even inside a digit group.
+    wrapped = "Application ID\n1212-0001-9988-77\n66\nEnd"
+    clean, redactions = sanitizer.sanitize(wrapped)
+    assert "1212" not in clean and "7766" not in clean
+    assert len(redactions) == 1
+
+    clean, redactions = sanitizer.sanitize("Claim reference PIP-2026-0048213 and council ref CT-99001122")
+    assert "PIP-2026" not in clean and "CT-99001122" not in clean
+    assert len(redactions) == 2
+
+
 def test_analyze_ukvi_further_evidence_letter():
     ukvi_letter = """
     UK Visas and Immigration

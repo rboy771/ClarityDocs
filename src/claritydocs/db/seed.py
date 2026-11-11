@@ -5,6 +5,19 @@ from pathlib import Path
 DB_PATH = Path(__file__).resolve().parent / "rules.db"
 SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
 
+# Which issuing body each rule belongs to. The matcher only searches rules for the
+# authority it detected in the letter.
+AUTHORITY_BY_RULE = {
+    "ukvi_finance_28day": "ukvi",
+    "ukvi_tb_certificate": "ukvi",
+    "ukvi_english_selt": "ukvi",
+    "ukvi_accommodation": "ukvi",
+    "ukvi_skilled_worker_cos": "ukvi",
+    "eu_settlement_scheme_euss": "ukvi",
+    "dwp_mandatory_reconsideration": "dwp",
+    "council_tax_reduction_hardship": "council",
+}
+
 INITIAL_RULES = [
     {
         "rule_id": "ukvi_finance_28day",
@@ -62,7 +75,7 @@ INITIAL_RULES = [
         "category": "mandatory_document",
         "citation": "UKVI Appendix Skilled Worker (SW 4.1 - SW 14.5)",
         "description": "Valid assigned Certificate of Sponsorship (CoS) meeting general salary thresholds and standard occupational classification (SOC) code rates.",
-        "keywords": "certificate of sponsorship cos salary threshold soc code sponsor licence skilled worker employment contract",
+        "keywords": "certificate of sponsorship cos salary threshold soc code sponsor licence skilled worker",
         "pitfalls": json.dumps([
             "Offered salary does not meet the revised general salary threshold or the specific SOC going rate.",
             "CoS assigned under an expired or revoked Home Office sponsor licence."
@@ -113,6 +126,9 @@ def init_db(db_path: Path = DB_PATH, schema_path: Path = SCHEMA_PATH) -> None:
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
+    # Rebuild from scratch so schema changes always take effect on an existing database file
+    cursor.execute("DROP TABLE IF EXISTS statutory_rules")
+
     # Apply schema
     with open(schema_path, "r", encoding="utf-8") as f:
         cursor.executescript(f.read())
@@ -124,11 +140,12 @@ def init_db(db_path: Path = DB_PATH, schema_path: Path = SCHEMA_PATH) -> None:
     for r in INITIAL_RULES:
         cursor.execute(
             """
-            INSERT INTO statutory_rules (rule_id, rule_name, category, citation, description, keywords, pitfalls)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO statutory_rules (rule_id, authority, rule_name, category, citation, description, keywords, pitfalls)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 r["rule_id"],
+                AUTHORITY_BY_RULE[r["rule_id"]],
                 r["rule_name"],
                 r["category"],
                 r["citation"],

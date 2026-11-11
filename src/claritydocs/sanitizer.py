@@ -14,8 +14,25 @@ PASSPORT_REGEX = re.compile(r"\b[0-9]{9}\b")
 # UK Postcode regex
 POSTCODE_REGEX = re.compile(r"\b[A-Z]{1,2}[0-9][A-Z0-9]?\s?[0-9][A-Z]{2}\b", re.IGNORECASE)
 
-# Home Office / UKVI Case reference patterns (e.g. 1212-0001-1234-5678, HO/1234567, GWF012345678, EUSS-12345678)
-HO_REF_REGEX = re.compile(r"\b(EUSS-\d{6,10}|GWF\d{9}|HO/\d{6,8}|\d{4}-\d{4}-\d{4}-\d{4})\b", re.IGNORECASE)
+# Case, claim and application references. Examples:
+#   1212-0001-1234-5678   Home Office application ID. PDF text extraction can split it anywhere
+#                         (after a hyphen, or even inside a group of digits), so whitespace is
+#                         allowed between digits and after hyphens.
+#   GWF012345678          UKVI reference
+#   HO/1234567            older Home Office reference
+#   PIP-2026-0048213      DWP claim reference
+#   EUSS-12345678, CT-99001122   prefix-and-digits references
+_DIGITS4 = r"\d\s?\d\s?\d\s?\d"
+HO_REF_REGEX = re.compile(
+    r"\b(?:"
+    r"[A-Z]{2,5}-\d{4}-\d{6,8}"
+    r"|[A-Z]{2,5}-\d{6,10}"
+    r"|GWF\d{9}"
+    r"|HO/\d{6,8}"
+    rf"|{_DIGITS4}-\s*{_DIGITS4}-\s*{_DIGITS4}-\s*{_DIGITS4}"
+    r")\b",
+    re.IGNORECASE,
+)
 
 # UK Phone numbers
 PHONE_REGEX = re.compile(r"\b(?:\+44\s?|0)(?:7\d{3}|\d{4})\s?\d{6}\b")
